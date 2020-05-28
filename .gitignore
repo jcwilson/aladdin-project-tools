@@ -1,0 +1,14 @@
+# Local overrides that you don't want to commit to the repo
+
+# Poetry build assets
+*.egg-info
+pip-wheel-metadata
+
+# Sphinx build assets
+docs/built/.doctrees/environment.pickle
+
+
+# Note: If you're thinking about adding IDE-related or language artifacts here
+#       consider adding those to your global git core.excludesfile instead.
+#       Entries here should relate to files specific and relevant to this project.
+#       Do your part to rid the world of bloated in-project .gitignore files.

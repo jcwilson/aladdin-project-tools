@@ -1,0 +1,30 @@
+meta:
+  version: 1
+
+# The language will be discovered from the base image if not provided here.
+# Provide the value here to speed up the build a little bit.
+# Take care to update this as needed if you change the base image.
+language:
+  name: python
+  version: 3.7.6
+
+image:
+  base: jupyter/minimal-notebook:dc9744740e12
+  add_poetry: true
+
+  # If provided, the poetry tool and any python libraries will be installed
+  # under that user. Providing these can also speed up the build as they
+  # won't need to be discovered from the image by a small bit.
+  # Otherwise, they will be installed under the Dockerfile USER account in
+  # the image.
+  user:
+    name: jovyan
+    group: users
+    home: /home/jovyan
+
+# Other dependencies that will be built and composited into this component.
+# In this example, if "api" or "commands" depend on a "shared" component,
+# it will also be composited into the image.
+dependencies:
+- commands
+- api

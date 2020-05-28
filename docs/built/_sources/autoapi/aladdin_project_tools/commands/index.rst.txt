@@ -1,0 +1,31 @@
+:mod:`aladdin_project_tools.commands`
+=====================================
+
+.. py:module:: aladdin_project_tools.commands
+
+.. autoapi-nested-parse::
+
+   Shell scripts available after installing the project.
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   components/index.rst
+   docs/index.rst
+
+
+Package Contents
+----------------
+
+.. function:: install_coloredlogs(log_level: str)
+
+   Setup our enhanced logging functionality.
+
+   :param log_level: The log level to use for the duration of the command.
+
+

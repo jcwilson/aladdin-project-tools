@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>aladdin_project_tools.commands.docs &mdash; Aladdin project tools  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Aladdin project tools
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/index.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Aladdin project tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../aladdin_project_tools.html">aladdin_project_tools</a> &raquo;</li>
+        
+          <li><a href="../commands.html">aladdin_project_tools.commands</a> &raquo;</li>
+        
+      <li>aladdin_project_tools.commands.docs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for aladdin_project_tools.commands.docs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Commands for working with the project&#39;s documentation.</span>
+
+<span class="sd">Once you ``poetry install`` this project, you can invoke these commands at the command line.</span>
+
+<span class="sd">.. code-block:: shell</span>
+<span class="sd">    :caption: When not in a poetry shell</span>
+
+<span class="sd">    $ poetry run docs --help</span>
+
+
+<span class="sd">.. code-block:: shell</span>
+<span class="sd">    :caption: When in an activated poetry shell</span>
+
+<span class="sd">    $ docs --help</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">import</span> <span class="nn">typer</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">sphinx.cmd.build</span> <span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">sphinx_main</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">LogLevel</span><span class="p">,</span> <span class="n">install_coloredlogs</span>
+
+<span class="c1"># Created in the callback</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">add_completion</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:autoapiskip:</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">()</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/docs/index.html#aladdin_project_tools.commands.docs.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+    <span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="p">:</span> <span class="n">LogLevel</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set the Python logger log level for this command.&quot;</span>
+    <span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Commands for generating the documentation.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param ctx: The typer-provided context for the command invocation.</span>
+<span class="sd">    :param log_level: The Python logger log level for this command.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">logger</span>
+
+    <span class="n">install_coloredlogs</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">invoked_subcommand</span><span class="p">)</span></div>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="build"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/docs/index.html#aladdin_project_tools.commands.docs.build">[docs]</a><span class="k">def</span> <span class="nf">build</span><span class="p">(</span>
+    <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Open the docs in a browser after they have been built.&quot;</span><span class="p">),</span>
+    <span class="n">sphinx_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the documentation.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param show: Open the docs in a browser after they have been built, defaults to False.</span>
+<span class="sd">    :param sphinx_args: Any remaining arguments will be passed to the underlying ``sphinx_main()``</span>
+<span class="sd">                        function that actually builds the docs.</span>
+
+<span class="sd">                        .. important::</span>
+<span class="sd">                            If these arguments contain ``-`` or ``--`` flags, you will need to</span>
+<span class="sd">                            preface this argument list with ``--``.</span>
+
+<span class="sd">    **Examples:**</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Simple build</span>
+
+<span class="sd">        $ docs build</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Open the docs afterwards</span>
+
+<span class="sd">        $ docs build --show</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Perform a full rebuild with debug logging</span>
+
+<span class="sd">        $ docs --log-level DEBUG build -- a</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check that both the schema and the sample component.yaml file are correct</span>
+    <span class="n">_validate_component_schema</span><span class="p">()</span>
+
+    <span class="n">built_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;docs&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;built&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating docs at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">built_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sphinx_main</span><span class="p">([</span><span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;docs/source&quot;</span><span class="p">,</span> <span class="s2">&quot;docs/built&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;Docs generated at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">built_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Docs not generated&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">(</span><span class="s2">&quot;Failed to build docs&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span><span class="s2">&quot;Opening generated docs in a browser&quot;</span><span class="p">)</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">launch</span><span class="p">((</span><span class="n">built_path</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_component_schema</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that both the schema and the sample_component.yaml file are correct.</span>
+
+<span class="sd">    The schema at least is also validated at component build time. We just want to do our best to</span>
+<span class="sd">    ensure that the documentation doesn&#39;t stray from the functionality.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;aladdin_project_tools&quot;</span><span class="p">,</span> <span class="s2">&quot;etc&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">etc</span><span class="p">:</span>
+            <span class="n">schema_file_path</span> <span class="o">=</span> <span class="n">etc</span> <span class="o">/</span> <span class="s2">&quot;component_schema.json&quot;</span>
+            <span class="n">sample_file_path</span> <span class="o">=</span> <span class="n">etc</span> <span class="o">/</span> <span class="s2">&quot;sample_component.yaml&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">schema_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">schema_file</span><span class="p">:</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">schema_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load schema file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">schema_file_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">jsonschema</span><span class="o">.</span><span class="n">Draft7Validator</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">SchemaError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid etc/component_schema.json</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sample_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">component_file</span><span class="p">:</span>
+        <span class="n">component_yaml</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">component_file</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">component_yaml</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid etc/sample_component.yaml</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="show"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/docs/index.html#aladdin_project_tools.commands.docs.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Open the documentation in a browser.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    **Example:**</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Open the docs</span>
+
+<span class="sd">        $ docs show</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span><span class="s2">&quot;Opening generated docs in a browser&quot;</span><span class="p">)</span>
+    <span class="n">built_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;docs&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;built&quot;</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span>
+    <span class="n">typer</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">built_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Josh Wilson
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+:mod:`aladdin_project_tools`
+============================
+
+.. py:module:: aladdin_project_tools
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   commands/index.rst
+
+
+Package Contents
+----------------
+
+.. data:: __version__
+   :annotation: = 0.1.0
+
+   
+

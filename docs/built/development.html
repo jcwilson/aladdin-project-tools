@@ -1,0 +1,616 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Development &mdash; Aladdin project tools  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code" href="code/index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="index.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Aladdin project tools
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-poetry">Using poetry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#project-scripts">Project scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#developing-components">Developing components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#structure-of-a-component">Structure of a component</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-dockerignore-file">The <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-dockerfile">The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-pyproject-toml-and-poetry-lock-files">The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-component-yaml-file">The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-rest">The rest</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-new-component">Create a new component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-a-component">Build a component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-a-component">Run a component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edit-a-component-s-python-dependencies">Edit a component’s python dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-documentation">Generating documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#write-the-docs">Write the docs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#code-documentation">Code documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#project-documentation">Project documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#build-the-docs">Build the docs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code/index.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Aladdin project tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Development</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/development.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="code/index.html" class="btn btn-neutral float-right" title="Code" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="development">
+<h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-poetry">
+<h2>Using poetry<a class="headerlink" href="#using-poetry" title="Permalink to this headline">¶</a></h2>
+<p>This project uses <a class="reference external" href="https://python-poetry.org/">poetry</a> as its package manager and build system. It offers support for deterministic installation of dependencies by utilizing a lock file as well as other useful features to assist application and library development.</p>
+<p>While most development operations take place inside of docker containers or in a kubernetes cluster, there are still some things that need to run directly from the development machine. We use <a class="reference external" href="https://python-poetry.org/docs/pyproject/#scripts">poetry scripts</a> to manage those operations. All of the project-level operations take place in a python virtual environment that poetry automatically creates and maintains for us. See the <a class="reference internal" href="#project-scripts"><span class="std std-ref">Project scripts</span></a> section below for more information.</p>
+<div class="section" id="getting-started">
+<h3>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h3>
+<p>The first thing you’ll want to do is create a virtual environment and install this project (and implicitly all of its dependencies).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ poetry install
+</pre></div>
+</div>
+<p>Then activate the virtual environment with</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ poetry shell
+</pre></div>
+</div>
+<p>Now you have access to all of the project’s dependencies, including dev dependencies, so you can do things like run <cite>pytest</cite> and such without affecting your system’s python installation. You will probably want to always be in the poetry shell when working on this project, so be sure to run this command any time you open a new terminal to begin work here.</p>
+</div>
+<div class="section" id="project-scripts">
+<h3>Project scripts<a class="headerlink" href="#project-scripts" title="Permalink to this headline">¶</a></h3>
+<p>One poetry feature that we make use of is its ability to create first-order CLI commands from python scripts. When we ran the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> command, it installed a few executables in the virtual environment’s <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory. You can see their configuration in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.scripts]</span>
+<span class="n">docs</span> <span class="o">=</span> <span class="s">&quot;bin.commands.docs:app&quot;</span>
+<span class="n">components</span> <span class="o">=</span> <span class="s">&quot;bin.commands.components:app&quot;</span>
+</pre></div>
+</div>
+<p>While in the poetry shell, you can run these as CLI commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ components --help
+Usage: components [OPTIONS] COMMAND [ARGS]...
+
+  Commands for working with the project&#39;s components.
+
+Options:
+  --log-level [NOTSET|SPAM|DEBUG|VERBOSE|INFO|NOTICE|WARN|WARNING|SUCCESS|ERROR|CRITICAL|FATAL]
+                                  Set the Python logger log level for this
+                                  command.
+
+  --install-completion [bash|zsh|fish|powershell|pwsh]
+                                  Install completion for the specified shell.
+  --show-completion [bash|zsh|fish|powershell|pwsh]
+                                  Show completion for the specified shell, to
+                                  copy it or customize the installation.
+
+  --help                          Show this message and exit.
+
+Commands:
+  build     Build the docker images for the project&#39;s components.
+  create    Add a new component to the project.
+  edit      Run the editor container for the specified component.
+  list      List all of the current components.
+  run       Run a command in a component&#39;s container.
+  validate  Validate the components&#39; component.yaml files.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="developing-components">
+<h2>Developing components<a class="headerlink" href="#developing-components" title="Permalink to this headline">¶</a></h2>
+<p>A component is simply a collection of assets (code, binaries, images, etc) that you wish to publish as a docker image. These images can be used for any purpose including:</p>
+<ul class="simple">
+<li><p>a pod container image to be used a kubernetes deployment</p></li>
+<li><p>local instantiation for CI purposes</p></li>
+<li><p>a building block to be included in another component’s image</p></li>
+</ul>
+<p>All defined component operations are available through the <code class="docutils literal notranslate"><span class="pre">components</span></code> CLI command. To get more details on a particular sub-command’s usage, use the <code class="docutils literal notranslate"><span class="pre">--help</span></code> flag.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components --help
+$ components build --help
+</pre></div>
+</div>
+<div class="section" id="structure-of-a-component">
+<h3>Structure of a component<a class="headerlink" href="#structure-of-a-component" title="Permalink to this headline">¶</a></h3>
+<p>All components live in the <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory. All files are optional. See below for how each one can be used to modify the component’s resulting docker image.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;project root&gt;/
+    build/
+        ...
+    components/
+        &lt;name of your component&gt;/
+            .dockerignore
+            component.yaml
+            pyproject.toml
+            poetry.lock
+            Dockerfile
+            # All other content like code, entrypoint
+            # scripts and component-specific configuration
+            # also go in here.
+            # These will all be made available in the
+            # docker build context so you can COPY them
+            # into your image if need be.
+    docs/
+        ...
+    helm/
+        ...
+    ...
+</pre></div>
+</div>
+<p>If you provide none of the files listed above, your component image will still be built and contain the contents of your component directory. It will just have the “aladdinized” version of the base image for your language. (Currently only python3 is supported). This means the following changes will be made to the base image:</p>
+<ul class="simple">
+<li><p>The python system libraries will be pre-compiled with the appropriate optimizaton level for the build context (unoptimized for dev, <code class="docutils literal notranslate"><span class="pre">-O</span></code> otherwise)</p></li>
+<li><p>The working directory will be set to <code class="docutils literal notranslate"><span class="pre">/code</span></code> and <code class="docutils literal notranslate"><span class="pre">/code</span></code> will be added to the <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code> will be created in the <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code> group, along with its home directory</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">poetry</span></code> tool will be installed and available to <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code></p></li>
+</ul>
+<div class="section" id="the-dockerignore-file">
+<h4>The <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file<a class="headerlink" href="#the-dockerignore-file" title="Permalink to this headline">¶</a></h4>
+<p>Each component can define its own <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file that will be appended to the global <code class="docutils literal notranslate"><span class="pre">components/.dockerignore</span></code>. Any entries in here should be relative to the component’s directory, as the build system will provide the build context-relative prefix automatically.</p>
+</div>
+<div class="section" id="the-dockerfile">
+<h4>The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code><a class="headerlink" href="#the-dockerfile" title="Permalink to this headline">¶</a></h4>
+<p>You may also provide your own <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>. This will allow you do perform your own specialization not covered by installing python packages through poetry. You can alter the user and their home directory and the build system will detect this and adapt when installing <code class="docutils literal notranslate"><span class="pre">poetry</span></code> and python package dependencies.</p>
+<p>The docker build context is always the <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory. The build system uses dynamic <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> files to limit the scope of what’s available in the build context, though. For instance, performing a <code class="docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">.</span> <span class="pre">.</span></code> command in your component’s <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> will only copy over your component’s directory. (This is just an example, as this exact <code class="docutils literal notranslate"><span class="pre">COPY</span></code> command is already part of the image building process. In practice, you will rarely need to do your own <code class="docutils literal notranslate"><span class="pre">COPY</span></code>-ing.)</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you set the <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code> in your <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>, all of your component’s assets and your component’s dependencies’ assets will also be placed in the new <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code>, too. You probably don’t want to set your own <code class="docutils literal notranslate"><span class="pre">WORKDER</span></code> unless you have some special use case. It is recommended that you leave it as <code class="docutils literal notranslate"><span class="pre">/code</span></code>, and if you wish to use a different working directory when running the container, use the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span> <span class="pre">-w</span> <span class="pre">&lt;workdir&gt;</span></code> option or the <code class="docutils literal notranslate"><span class="pre">workingDir:</span></code> setting in your helm templates.</p>
+</div>
+</div>
+<div class="section" id="the-pyproject-toml-and-poetry-lock-files">
+<h4>The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files<a class="headerlink" href="#the-pyproject-toml-and-poetry-lock-files" title="Permalink to this headline">¶</a></h4>
+<p>You will probably provide your own <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files to specify which python packages your component needs. See the <a class="reference internal" href="#edit-a-component-s-python-dependencies"><span class="std std-ref">Edit a component’s python dependencies</span></a> section below for details about this.</p>
+</div>
+<div class="section" id="the-component-yaml-file">
+<h4>The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file<a class="headerlink" href="#the-component-yaml-file" title="Permalink to this headline">¶</a></h4>
+<p>The component build system makes some assumptions about your component:</p>
+<ul class="simple">
+<li><p>It is written in Python 3</p></li>
+<li><p>The base image of <code class="docutils literal notranslate"><span class="pre">python:3.8-slim</span></code> is acceptable</p></li>
+<li><p>You wish to have poetry installed in the container</p></li>
+<li><p>You wish for the container process to run as <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code></p></li>
+<li><p>It has no dependencies on other components in this project</p></li>
+<li><p>The working directory will be <code class="docutils literal notranslate"><span class="pre">/code</span></code> and it will be added to the <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></p></li>
+</ul>
+<p>If any of these assumptions do not hold true for your component, you will need to create a <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file to customize the image build process for your component. Use the file to choose an alternative base image and/or adjust which changes from above are applied.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you specify a base image in the <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file, it will not be “aladdinized” or have <code class="docutils literal notranslate"><span class="pre">poetry</span></code> installed by default. It is assumed you are using a different base image for reasons other than building a standard “code” component. You can still instruct the system to apply those changes, but the default behavior is to not apply them when you use a different base image.</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> schema</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;https://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
+
+    <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Component&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Configuration for customizing the component image build process.&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Data used for determining which schema to use.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;minimum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="nt">&quot;maximum&quot;</span><span class="p">:</span> <span class="mi">1</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The build system will locate an appropriate base image for the given language information.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The component&#39;s implementation language.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">],</span>
+                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The language version.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;3.8&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;3.7&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;3.8.2&quot;</span>
+                    <span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Customize the image build process with these values.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;base&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Use this image instead of the language-derived base image.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;python:3.8-slim&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;fivestarsos/commands-base:2.0.0&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;jupyter/minimal-notebook:dc9744740e12&quot;</span>
+                    <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;aladdinize&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to do basic aladdin setup. If the image base value is provided, this will default to false.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">true</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;add_poetry&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to install the poetry package manager on the image. If the image base value is provided, this will default to false.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">true</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Read-only details about where to install poetry and python libraries. If not provided, they will be extracted from the base image. Provide these to speed up the build process.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s name. Used for chown purposes.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s main group. Used for chown purposes.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;home&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s home directory. Will contain the poetry tool and installed python packages.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The other components that need to be aggregated into this component.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;uniqueitems&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;shared&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="s2">&quot;commands&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Example <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
+  <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+
+<span class="c1"># The language will be discovered from the base image if not provided here.</span>
+<span class="c1"># Provide the value here to speed up the build a little bit.</span>
+<span class="c1"># Take care to update this as needed if you change the base image.</span>
+<span class="nt">language</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+  <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3.7.6</span>
+
+<span class="nt">image</span><span class="p">:</span>
+  <span class="nt">base</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">jupyter/minimal-notebook:dc9744740e12</span>
+  <span class="nt">add_poetry</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+  <span class="c1"># If provided, the poetry tool and any python libraries will be installed</span>
+  <span class="c1"># under that user. Providing these can also speed up the build as they</span>
+  <span class="c1"># won&#39;t need to be discovered from the image by a small bit.</span>
+  <span class="c1"># Otherwise, they will be installed under the Dockerfile USER account in</span>
+  <span class="c1"># the image.</span>
+  <span class="nt">user</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">jovyan</span>
+    <span class="nt">group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">users</span>
+    <span class="nt">home</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/home/jovyan</span>
+
+<span class="c1"># Other dependencies that will be built and composited into this component.</span>
+<span class="c1"># In this example, if &quot;api&quot; or &quot;commands&quot; depend on a &quot;shared&quot; component,</span>
+<span class="c1"># it will also be composited into the image.</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">commands</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">api</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-rest">
+<h4>The rest<a class="headerlink" href="#the-rest" title="Permalink to this headline">¶</a></h4>
+<p>Every other file and directory is up to you!</p>
+</div>
+</div>
+<div class="section" id="create-a-new-component">
+<h3>Create a new component<a class="headerlink" href="#create-a-new-component" title="Permalink to this headline">¶</a></h3>
+<p>Run the following command and follow the prompts to create a new component. If you opt out of all of the guided setup steps, you will still have added a component with the simplest possible configuration, an empty directory, under <code class="docutils literal notranslate"><span class="pre">components/</span></code>. It will be the aladdinized <code class="docutils literal notranslate"><span class="pre">python:3.8-slim</span></code> image.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components create
+</pre></div>
+</div>
+<p>The prompt will offer you the chance to add python package dependencies by running <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">init</span></code> to create a poetry <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file for your component. If you do, it will then update your component image to build these dependencies into the image. Even if you don’t know what packages you’ll need yet for your component, it is recommended that you still opt to configure your dependencies with poetry to create the basic <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file. You can edit it later with the <code class="docutils literal notranslate"><span class="pre">components</span> <span class="pre">edit</span></code> command.</p>
+<p>The prompt will also offer you the chance to create a new (empty) <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> for your component. Once you edit it, build your component again to pick up the changes. Chances are you won’t need to do this at first unless you know for sure that you’ll need to build upon the basic “aladdinized” image. You can always add it later, as well</p>
+</div>
+<div class="section" id="build-a-component">
+<h3>Build a component<a class="headerlink" href="#build-a-component" title="Permalink to this headline">¶</a></h3>
+<p>We wrap the <code class="docutils literal notranslate"><span class="pre">aladdin</span> <span class="pre">build</span></code> command with the <code class="docutils literal notranslate"><span class="pre">components</span> <span class="pre">build</span></code> command. It performs some extra validation before delegating to <code class="docutils literal notranslate"><span class="pre">aladdin</span> <span class="pre">build</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components build <span class="o">[</span>components<span class="o">]</span>...
+</pre></div>
+</div>
+<p>If you specify no components, it will build all of the components in the project. Even with a complex project with many components, the build system’s use of multi-stage builds and <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> caching should keep build times to a minimum. Still, specifying the one or two components you need to rebuild can save you some time during day-to-day development.</p>
+<p>When a component is built, first all of the other components listed in its <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> dependencies list are built (and their dependencies, too, recursively). For each dependency built in this manner, its python package dependencies and its assets are copied into the component image being built using the docker multi-stage builder pattern. <strong>In this way we can avoid costly rebuilds of shared assets and dependencies by placing reusable code and libraries in a shared component.</strong> The shared component will be built once and then its assets copied to all other components that depend upon it.</p>
+<p>Once the component is built, it’s ready for use. You should now be able to reference it your helm templates and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">hooks</span></code> scripts and so on.</p>
+</div>
+<div class="section" id="run-a-component">
+<h3>Run a component<a class="headerlink" href="#run-a-component" title="Permalink to this headline">¶</a></h3>
+<p>For quick tests or debugging, you may be able to run your component with a direct <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> invocation. Presuming your image does not use the “exec form” for its <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> and you are able to run arbitrary commands against it, you can run your component image. By default, it will mount the <code class="docutils literal notranslate"><span class="pre">components</span></code> directory at <code class="docutils literal notranslate"><span class="pre">/code</span></code> in the container.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components run &lt;component&gt; <span class="o">[</span>command<span class="o">]</span>...
+</pre></div>
+</div>
+</div>
+<div class="section" id="edit-a-component-s-python-dependencies">
+<h3>Edit a component’s python dependencies<a class="headerlink" href="#edit-a-component-s-python-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Every time a component image is built, an additional “editor” image is built alongside it. This to allow easier editing of poetry-managed python package dependencies. This is very similar to running the component image, except its default <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> and <code class="docutils literal notranslate"><span class="pre">CMD</span></code> values are cleared and you are dropped right into a <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell in your component’s directory. In situations where you cannot run the container due to a strict <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> or missing environment variables, using this <code class="docutils literal notranslate"><span class="pre">edit</span></code> sub-command is a useful option to inspect your container’s contents.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components edit &lt;component&gt;
+</pre></div>
+</div>
+<p>Run this command to be dropped into a container where you can immediately run <cite>poetry add/remove/update</cite> commands. Since the local filesystem’s <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory will be mounted into the container, any edits to the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> or <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files will be preserved. Upon successfully exiting the container, the image will automatically be built again if any changes to the <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> file were detected.</p>
+<p>To simply update all of your package dependencies to the latest versions allowed by your <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, use the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">update</span></code> command.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># In the poetry shell</span>
+$ components edit &lt;component&gt;
+
+<span class="c1"># In the component&#39;s container</span>
+$ poetry update
+</pre></div>
+</div>
+<p>You can also edit the dependencies by hand, though it’s not recommended. If you do, be sure to update the lock file. Remember, the lock file is the source of truth for what gets installed in your component image.:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># In the poetry shell</span>
+$ components edit &lt;component&gt;
+
+<span class="c1"># In the component&#39;s container</span>
+$ poetry lock
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These dependencies are specific to the component and are fully contained within the component’s docker image and container. They do not interact with the main project’s poetry configuration or shell environment at all.</p>
+</div>
+</div>
+</div>
+<div class="section" id="generating-documentation">
+<h2>Generating documentation<a class="headerlink" href="#generating-documentation" title="Permalink to this headline">¶</a></h2>
+<p>The documentation operations are available through the <code class="docutils literal notranslate"><span class="pre">docs</span></code> CLI command. To get more details on a particular sub-command’s usage, use the <code class="docutils literal notranslate"><span class="pre">--help</span></code> flag.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docs --help
+$ docs build --help
+</pre></div>
+</div>
+<div class="section" id="write-the-docs">
+<h3>Write the docs<a class="headerlink" href="#write-the-docs" title="Permalink to this headline">¶</a></h3>
+<p>We use <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> and <a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html">Restructured Text</a> (reST or rST) for both our descriptive documentation and code documentation.</p>
+<div class="section" id="code-documentation">
+<h4>Code documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h4>
+<p>We use the Sphinx <a class="reference external" href="https://sphinx-autoapi.readthedocs.io/en/latest/index.html">autoapi</a> extension to discover and generate documentation from our code comments. It is smart enough to describe the prescriptive aspects of our code where we use Python type annotations, but developers are still responsible for providing context and explanation to best communicate the code’s behavior and intent.</p>
+</div>
+<div class="section" id="project-documentation">
+<h4>Project documentation<a class="headerlink" href="#project-documentation" title="Permalink to this headline">¶</a></h4>
+<p>You can find the source files in the <code class="docutils literal notranslate"><span class="pre">docs/source</span></code> directory.</p>
+</div>
+</div>
+<div class="section" id="build-the-docs">
+<h3>Build the docs<a class="headerlink" href="#build-the-docs" title="Permalink to this headline">¶</a></h3>
+<p>Build the HTML documentation with the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docs build <span class="o">[</span>--show<span class="o">]</span>
+</pre></div>
+</div>
+<p>Specify <code class="docutils literal notranslate"><span class="pre">--show</span></code> to open them in your browser after they are built.</p>
+<p>To show the docs without building them again, run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docs show
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code/index.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Josh Wilson
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

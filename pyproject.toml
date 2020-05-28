@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "aladdin-project-tools"
+version = "0.1.0"
+description = ""
+authors = ["Josh Wilson <josh.wilson@fivestars.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+coloredlogs = "^14.0"
+sphinx = "^3.0.1"
+sphinx-autoapi = "^1.3.0"
+sphinx-rtd-theme = "^0.4.3"
+typer = "^0.1.1"
+verboselogs = "^1.7"
+jsonschema = "^3.2.0"
+PyYAML = "^5.3.1"
+isort = "^4.3.21"
+toposort = "^1.5"
+networkx = "^2.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[tool.poetry.scripts]
+docs = "aladdin_project_tools.commands.docs:app"
+components = "aladdin_project_tools.commands.components:app"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

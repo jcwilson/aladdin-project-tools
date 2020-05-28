@@ -1,0 +1,83 @@
+:mod:`aladdin_project_tools.commands.docs`
+==========================================
+
+.. py:module:: aladdin_project_tools.commands.docs
+
+.. autoapi-nested-parse::
+
+   Commands for working with the project's documentation.
+
+   Once you ``poetry install`` this project, you can invoke these commands at the command line.
+
+   .. code-block:: shell
+       :caption: When not in a poetry shell
+
+       $ poetry run docs --help
+
+
+   .. code-block:: shell
+       :caption: When in an activated poetry shell
+
+       $ docs --help
+
+
+
+Module Contents
+---------------
+
+.. function:: main(ctx: typer.Context, log_level: LogLevel = typer.Option(LogLevel.INFO, help='Set the Python logger log level for this command.'))
+
+   Commands for generating the documentation.
+
+
+
+   :param ctx: The typer-provided context for the command invocation.
+   :param log_level: The Python logger log level for this command.
+
+
+.. function:: build(show: bool = typer.Option(False, help='Open the docs in a browser after they have been built.'), sphinx_args: List[str] = typer.Argument(None))
+
+   Build the documentation.
+
+
+
+   :param show: Open the docs in a browser after they have been built, defaults to False.
+   :param sphinx_args: Any remaining arguments will be passed to the underlying ``sphinx_main()``
+                       function that actually builds the docs.
+
+                       .. important::
+                           If these arguments contain ``-`` or ``--`` flags, you will need to
+                           preface this argument list with ``--``.
+
+   **Examples:**
+
+   .. code-block:: shell
+       :caption: Simple build
+
+       $ docs build
+
+   .. code-block:: shell
+       :caption: Open the docs afterwards
+
+       $ docs build --show
+
+   .. code-block:: shell
+       :caption: Perform a full rebuild with debug logging
+
+       $ docs --log-level DEBUG build -- a
+
+
+.. function:: show()
+
+   Open the documentation in a browser.
+
+
+
+   **Example:**
+
+   .. code-block:: shell
+       :caption: Open the docs
+
+       $ docs show
+
+

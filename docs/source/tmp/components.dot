@@ -1,0 +1,18 @@
+strict digraph "" {
+	graph [edge_default="{}",
+		node_default="{}"
+	];
+	node [color=blue,
+		shape=box,
+		style="rounded, bold"
+	];
+	api -> lab;
+	api -> pipeline;
+	api -> "pipeline-flake8";
+	commands -> lab;
+	commands -> pipeline;
+	commands -> "pipeline-flake8";
+	shared -> api;
+	shared -> commands;
+	shared -> init;
+}

@@ -1,0 +1,103 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+
+    "title": "Component",
+    "description": "Configuration for customizing the component image build process.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "description": "Data used for determining which schema to use.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                }
+            }
+        },
+        "language": {
+            "description": "The build system will locate an appropriate base image for the given language information.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "description": "The component's implementation language.",
+                    "type": "string",
+                    "enum": ["python"],
+                    "default": "python"
+                },
+                "version": {
+                    "description": "The language version.",
+                    "type": "string",
+                    "default": "3.8",
+                    "examples": [
+                        "3.7",
+                        "3.8.2"
+                    ]
+                }
+            }
+        },
+        "image": {
+            "description": "Customize the image build process with these values.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "base": {
+                    "description": "Use this image instead of the language-derived base image.",
+                    "type": "string",
+                    "default": "python:3.8-slim",
+                    "examples": [
+                        "fivestarsos/commands-base:2.0.0",
+                        "jupyter/minimal-notebook:dc9744740e12"
+                    ]
+                },
+                "aladdinize": {
+                    "description": "Whether or not to do basic aladdin setup. If the image base value is provided, this will default to false.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "add_poetry": {
+                    "description": "Whether or not to install the poetry package manager on the image. If the image base value is provided, this will default to false.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "user": {
+                    "description": "Read-only details about where to install poetry and python libraries. If not provided, they will be extracted from the base image. Provide these to speed up the build process.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "name": {
+                            "description": "The container user's name. Used for chown purposes.",
+                            "type": "string"
+                        },
+                        "group": {
+                            "description": "The container user's main group. Used for chown purposes.",
+                            "type": "string"
+                        },
+                        "home": {
+                            "description": "The container user's home directory. Will contain the poetry tool and installed python packages.",
+                            "type": "string"
+                        }
+                    },
+                    "required": ["name"]
+                }
+            }
+        },
+        "dependencies": {
+            "description": "The other components that need to be aggregated into this component.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "uniqueitems": true,
+            "default": [],
+            "examples": [
+                ["shared"],
+                ["api", "commands"]
+            ]
+        }
+    }
+}

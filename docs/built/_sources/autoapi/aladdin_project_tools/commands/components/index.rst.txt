@@ -1,0 +1,148 @@
+:mod:`aladdin_project_tools.commands.components`
+================================================
+
+.. py:module:: aladdin_project_tools.commands.components
+
+.. autoapi-nested-parse::
+
+   Commands for working with the project's components.
+
+   Once you ``poetry install`` this project, you can invoke these commands at the command line.
+
+
+   .. code-block:: shell
+       :caption: When not in a poetry shell
+
+       $ poetry run components --help
+
+
+   .. code-block:: shell
+       :caption: When in an activated poetry shell
+
+       $ components --help
+
+
+
+Module Contents
+---------------
+
+.. function:: main(ctx: typer.Context, log_level: LogLevel = typer.Option(LogLevel.INFO, help='Set the Python logger log level for this command.'))
+
+   Commands for working with the project's components.
+
+
+
+   :param ctx: The typer invocation context.
+   :param log_level: The Python logger log level for this command.
+
+
+.. function:: validate(components: List[Component] = typer.Argument(None))
+
+   Validate the components' component.yaml files.
+
+   :param components: The components to validate, default is all of them.
+
+
+.. function:: create(name: pathlib.Path = typer.Argument(None))
+
+   Add a new component to the project.
+
+
+
+   :param name: The name of the new component.
+
+
+.. function:: build(components: List[Component] = typer.Argument(None))
+
+   Build the docker images for the project's components.
+
+   This will also perform validation on the components before attempting the build, too.
+
+
+
+   .. note::
+       This command is essentially ``aladdin build``, but is present here if one is more
+       comfortable using ``component`` commands to interact with this project.
+
+   :param components: The list of components to build. If none provided, all components will be
+                      built.
+
+   **Examples:**
+
+   .. code-block:: shell
+       :caption: Build all components
+
+       $ components build --log-level DEBUG
+
+   .. code-block:: shell
+       :caption: Build only the shared and api components
+
+       $ components build --log-level DEBUG shared api
+
+
+.. function:: run(component: Component, mount: pathlib.Path = typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            ')), command: List[str] = typer.Argument(None))
+
+   Run a command in a component's container.
+
+   This will mount the components/ directory in the container.
+
+   This doesn't precisely run the actual component's image, as oftentimes one will wish to
+   have an ENTRYPOINT and CMD already baked into the image. This runs an image with the sole
+   difference being that the ENTRYPOINT and CMD settings have been cleared. This gives us the
+   flexbility to get in and explore the container without compromising the image intended to be
+   published.
+
+
+
+   :param component: The component container to run.
+   :param mount: The container path at which to mount the ``commponents/`` directory, defaults to
+                 the container's working directory, defaults to ``/code``.
+   :param command: Any remaining arguments will be passed to the container as its ``run`` command,
+                   defaults to ``/bin/bash``.
+
+                   .. important:: If these arguments contain ``-`` or ``--`` flags, you will need
+                                  to preface this argument list with ``--``.
+
+   **Examples:**
+
+   .. code-block:: shell
+       :caption: Run the default CMD for the ``pipeline-flake8`` container
+
+       $ components run pipeline-flake8
+
+   .. code-block:: shell
+       :caption: Run a specific CMD for the ``pipeline`` container
+
+       $ components run pipeline prospector
+
+   .. code-block:: shell
+       :caption: Run a specific CMD with complex arguments for the ``pipeline`` container
+
+       $ components run pipeline -- black --check --diff --target-version py38 .
+
+
+.. function:: edit(component: Component, mount: pathlib.Path = typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            ')))
+
+   Run the editor container for the specified component.
+
+   This facilitates editing the poetry dependencies in the container that requires them. It assumes
+   the image uses poetry to manage its python dependencies.
+
+   This will mount the components/ directory in the container, but place you in the component's
+   specific directory to start.
+
+   If the poetry.lock file is changed, this will then rebuild this component and any components
+   that depend upon it.
+
+
+
+   :param component: The component whose dependencies you wish to edit.
+
+   **Example:**
+
+   .. code-block:: shell
+       :caption: Start a bash shell in the /code/api directory of the api container
+
+       $ components edit api
+
+

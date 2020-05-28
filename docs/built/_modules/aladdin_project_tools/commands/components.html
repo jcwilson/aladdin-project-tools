@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>aladdin_project_tools.commands.components &mdash; Aladdin project tools  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Aladdin project tools
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/index.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Aladdin project tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../aladdin_project_tools.html">aladdin_project_tools</a> &raquo;</li>
+        
+          <li><a href="../commands.html">aladdin_project_tools.commands</a> &raquo;</li>
+        
+      <li>aladdin_project_tools.commands.components</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for aladdin_project_tools.commands.components</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Commands for working with the project&#39;s components.</span>
+
+<span class="sd">Once you ``poetry install`` this project, you can invoke these commands at the command line.</span>
+
+
+<span class="sd">.. code-block:: shell</span>
+<span class="sd">    :caption: When not in a poetry shell</span>
+
+<span class="sd">    $ poetry run components --help</span>
+
+
+<span class="sd">.. code-block:: shell</span>
+<span class="sd">    :caption: When in an activated poetry shell</span>
+
+<span class="sd">    $ components --help</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">importlib.resources</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">typer</span>
+<span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">networkx.algorithms</span> <span class="kn">import</span> <span class="n">dag</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">LogLevel</span><span class="p">,</span> <span class="n">install_coloredlogs</span>
+
+<span class="c1"># Created in the callback</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">add_completion</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:autoapiskip:</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Discover the project&#39;s component directories</span>
+<span class="n">_components_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;components&quot;</span><span class="p">)</span>
+<span class="n">Component</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span>
+    <span class="s2">&quot;Component&quot;</span><span class="p">,</span>
+    <span class="p">{</span><span class="n">item</span><span class="p">:</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">_components_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_components_path</span> <span class="o">/</span> <span class="n">item</span><span class="p">)},</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The project components.</span>
+<span class="sd">:autoapiskip:</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">()</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+    <span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="p">:</span> <span class="n">LogLevel</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set the Python logger log level for this command.&quot;</span>
+    <span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Commands for working with the project&#39;s components.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param ctx: The typer invocation context.</span>
+<span class="sd">    :param log_level: The Python logger log level for this command.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">logger</span>
+
+    <span class="n">install_coloredlogs</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">invoked_subcommand</span><span class="p">)</span></div>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.validate">[docs]</a><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">components</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Component</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the components&#39; component.yaml files.</span>
+
+<span class="sd">    :param components: The components to validate, default is all of them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_validate_components</span><span class="p">(</span><span class="n">components</span> <span class="ow">or</span> <span class="n">Component</span><span class="p">)</span></div>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_list</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;List all of the current components.&quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Current components: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">Component</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a new component to the project.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param name: The name of the new component.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">typer</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s2">&quot;What is the name of the new component?&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">parts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Component name must be a valid file name and not be a path&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+    <span class="n">component</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;components&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">component</span>
+
+    <span class="c1"># Create the component directory</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating component directory&quot;</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not create component directory&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+    <span class="c1"># Build the component image</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building component image&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_aladdin_build</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">component</span><span class="p">]):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not build component&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+    <span class="c1"># Prompt them to create their pyproject.toml and add some python library dependencies</span>
+    <span class="k">if</span> <span class="n">typer</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s2">&quot;Configure python dependencies with poetry?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_docker_run</span><span class="p">(</span>
+            <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span>
+            <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">,</span>
+            <span class="n">mount</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;poetry&quot;</span><span class="p">,</span> <span class="s2">&quot;init&quot;</span><span class="p">],</span>
+            <span class="n">workdir</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/code&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">component</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created </span><span class="si">%s</span><span class="s2">/pyproject.toml&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+            <span class="c1"># Build the component image again with the new dependencies</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building component image&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_aladdin_build</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">component</span><span class="p">]):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not build component&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not initialize the poetry project for the component&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span>
+            <span class="s2">&quot;Use the &#39;components edit </span><span class="si">%s</span><span class="s2">&#39; command to create/update this component&#39;s&quot;</span>
+            <span class="s2">&quot; pyproject.toml file&quot;</span><span class="p">,</span>
+            <span class="n">component</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># # Prompt them to potentially create a Dockerfile for their component</span>
+    <span class="c1"># if typer.confirm(&quot;Create a Dockerfile for the new component?&quot;, default=True):</span>
+    <span class="c1">#     with open(path / &quot;Dockerfile&quot;, &quot;w&quot;) as dockerfile:</span>
+    <span class="c1">#         dockerfile.write(</span>
+    <span class="c1">#             textwrap.dedent(</span>
+    <span class="c1">#                 &quot;&quot;&quot;</span>
+    <span class="c1">#                 ### BASIC DOCKERFILE ###########################################################</span>
+    <span class="c1">#                 # Edit this file to further specialize your component image</span>
+    <span class="c1">#                 ################################################################################</span>
+    <span class="c1">#                 ARG FROM_IMAGE</span>
+    <span class="c1">#                 FROM $FROM_IMAGE</span>
+    <span class="c1">#                 &quot;&quot;&quot;</span>
+    <span class="c1">#             ).strip()</span>
+    <span class="c1">#         )</span>
+    <span class="c1">#     logger.info(&quot;%s/Dockerfile created&quot;, path.as_posix())</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;New component &#39;</span><span class="si">%s</span><span class="s2">&#39; created&quot;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Run this component with &#39;components edit </span><span class="si">%s</span><span class="s2">&#39; to update your poetry dependencies&quot;</span><span class="p">,</span> <span class="n">component</span></div>
+    <span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="build"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.build">[docs]</a><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">components</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Component</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the docker images for the project&#39;s components.</span>
+
+<span class="sd">    This will also perform validation on the components before attempting the build, too.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        This command is essentially ``aladdin build``, but is present here if one is more</span>
+<span class="sd">        comfortable using ``component`` commands to interact with this project.</span>
+
+<span class="sd">    :param components: The list of components to build. If none provided, all components will be</span>
+<span class="sd">                       built.</span>
+
+<span class="sd">    **Examples:**</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Build all components</span>
+
+<span class="sd">        $ components build --log-level DEBUG</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Build only the shared and api components</span>
+
+<span class="sd">        $ components build --log-level DEBUG shared api</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_validate_components</span><span class="p">(</span><span class="n">components</span> <span class="ow">or</span> <span class="n">Component</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span><span class="n">_aladdin_build</span><span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_components</span><span class="p">(</span><span class="n">components</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Component</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the components&#39; component.yaml files.</span>
+
+<span class="sd">    :param component: The component to validate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;aladdin_project_tools&quot;</span><span class="p">,</span> <span class="s2">&quot;etc&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">etc</span><span class="p">:</span>
+            <span class="n">schema_file_path</span> <span class="o">=</span> <span class="n">etc</span> <span class="o">/</span> <span class="s2">&quot;component_schema.json&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">schema_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">schema_file</span><span class="p">:</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">schema_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to load schema file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">schema_file_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">jsonschema</span><span class="o">.</span><span class="n">Draft7Validator</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+        <span class="n">component_yaml</span> <span class="o">=</span> <span class="n">_get_component_config</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">component_yaml</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">component_yaml</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid component.yaml for </span><span class="si">%s</span><span class="s2"> component:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_get_component_graph</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DiGraph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the dependency graph for our components.</span>
+
+<span class="sd">    This reads the ``component.yaml`` file for each component to determine dependencies.</span>
+
+<span class="sd">    :returns: The dependency graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create the graph</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">DiGraph</span><span class="p">()</span>
+    <span class="n">components</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">Component</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">Component</span><span class="p">:</span>
+        <span class="n">component_yaml</span> <span class="o">=</span> <span class="n">_get_component_config</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+        <span class="n">components</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">Component</span><span class="p">[</span><span class="n">dependency</span><span class="p">],</span> <span class="n">component</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dependency</span> <span class="ow">in</span> <span class="n">component_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dependencies&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Confirm that no cycles are present</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cycles</span> <span class="o">=</span> <span class="n">find_cycle</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">NetworkXNoCycle</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">components</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cycles found in component dependency graph&quot;</span><span class="p">,</span> <span class="n">cycles</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_component_config</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the contents of the component&#39;s component.yaml yaml file.</span>
+
+<span class="sd">    :param component: The component whose component.yaml you wish to retrieve.</span>
+<span class="sd">    :returns: The config contents or the empty dictionary if it was not present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;components&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="s2">&quot;component.yaml&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">component_yaml_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">component_yaml_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">_get_dependents_for</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a list of all other components that depend on ``component`` at some level.</span>
+
+<span class="sd">    :param component: The dependency component.</span>
+<span class="sd">    :return: The list of dependent components in topological order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">get_component_graph</span><span class="p">()</span>
+    <span class="n">dependents</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">descendants</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">topological_sort</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">dependents</span><span class="p">)))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+    <span class="n">component</span><span class="p">:</span> <span class="n">Component</span><span class="p">,</span>
+    <span class="n">mount</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="s2">&quot;/code&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            The container directory at which to mount the components directory.</span>
+
+<span class="sd">            Default: /code</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run a command in a component&#39;s container.</span>
+
+<span class="sd">    This will mount the components/ directory in the container.</span>
+
+<span class="sd">    This doesn&#39;t precisely run the actual component&#39;s image, as oftentimes one will wish to</span>
+<span class="sd">    have an ENTRYPOINT and CMD already baked into the image. This runs an image with the sole</span>
+<span class="sd">    difference being that the ENTRYPOINT and CMD settings have been cleared. This gives us the</span>
+<span class="sd">    flexbility to get in and explore the container without compromising the image intended to be</span>
+<span class="sd">    published.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param component: The component container to run.</span>
+<span class="sd">    :param mount: The container path at which to mount the ``commponents/`` directory, defaults to</span>
+<span class="sd">                  the container&#39;s working directory, defaults to ``/code``.</span>
+<span class="sd">    :param command: Any remaining arguments will be passed to the container as its ``run`` command,</span>
+<span class="sd">                    defaults to ``/bin/bash``.</span>
+
+<span class="sd">                    .. important:: If these arguments contain ``-`` or ``--`` flags, you will need</span>
+<span class="sd">                                   to preface this argument list with ``--``.</span>
+
+<span class="sd">    **Examples:**</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Run the default CMD for the ``pipeline-flake8`` container</span>
+
+<span class="sd">        $ components run pipeline-flake8</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Run a specific CMD for the ``pipeline`` container</span>
+
+<span class="sd">        $ components run pipeline prospector</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Run a specific CMD with complex arguments for the ``pipeline`` container</span>
+
+<span class="sd">        $ components run pipeline -- black --check --diff --target-version py38 .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span>
+        <span class="n">_docker_run</span><span class="p">(</span>
+            <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span><span class="p">,</span>
+            <span class="n">mount</span><span class="o">=</span><span class="n">mount</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">command</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;/bin/bash&quot;</span><span class="p">,)),</span></div>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<div class="viewcode-block" id="edit"><a class="viewcode-back" href="../../../autoapi/aladdin_project_tools/commands/components/index.html#aladdin_project_tools.commands.components.edit">[docs]</a><span class="k">def</span> <span class="nf">edit</span><span class="p">(</span>
+    <span class="n">component</span><span class="p">:</span> <span class="n">Component</span><span class="p">,</span>
+    <span class="n">mount</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="s2">&quot;/code&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            The container directory at which to mount the components directory.</span>
+
+<span class="sd">            Default: /code</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the editor container for the specified component.</span>
+
+<span class="sd">    This facilitates editing the poetry dependencies in the container that requires them. It assumes</span>
+<span class="sd">    the image uses poetry to manage its python dependencies.</span>
+
+<span class="sd">    This will mount the components/ directory in the container, but place you in the component&#39;s</span>
+<span class="sd">    specific directory to start.</span>
+
+<span class="sd">    If the poetry.lock file is changed, this will then rebuild this component and any components</span>
+<span class="sd">    that depend upon it.</span>
+<span class="sd">    \f</span>
+
+<span class="sd">    :param component: The component whose dependencies you wish to edit.</span>
+
+<span class="sd">    **Example:**</span>
+
+<span class="sd">    .. code-block:: shell</span>
+<span class="sd">        :caption: Start a bash shell in the /code/api directory of the api container</span>
+
+<span class="sd">        $ components edit api</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poetry_lock_md5</span> <span class="o">=</span> <span class="n">_get_poetry_lock_file_md5_digest</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_docker_run</span><span class="p">(</span>
+        <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span><span class="p">,</span>
+        <span class="n">mount</span><span class="o">=</span><span class="n">mount</span><span class="p">,</span>
+        <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="p">],</span>
+        <span class="n">workdir</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/code&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Encountered an error when editing the component&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">poetry_lock_md5</span> <span class="o">==</span> <span class="n">_get_poetry_lock_file_md5_digest</span><span class="p">(</span><span class="n">component</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No changes detected; Will not rebuild the component image&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">()</span>
+
+    <span class="n">dependents</span> <span class="o">=</span> <span class="n">_get_dependents_for</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span>
+        <span class="s2">&quot;Changes detected; Building the updated component image and its dependent components: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dependent</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">dependent</span> <span class="ow">in</span> <span class="n">dependents</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">_aladdin_build</span><span class="p">([</span><span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">]):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to build </span><span class="si">%s</span><span class="s2"> component after you edited it&quot;</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_aladdin_build</span><span class="p">([</span><span class="n">dependent</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">dependent</span> <span class="ow">in</span> <span class="n">dependents</span><span class="p">]):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to build all dependent components after you edited </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_poetry_lock_file_md5_digest</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the md5 digest of the contents of the poetry lock file.</span>
+
+<span class="sd">    :param component: The component whose poetry.lock file you wish to hash.</span>
+<span class="sd">    :return: The md5 digest, or None if the file was not present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poetry_lock_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;components&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">component</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="s2">&quot;poetry.lock&quot;</span>
+    <span class="k">if</span> <span class="n">poetry_lock_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">poetry_lock_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">poetry_lock_file</span><span class="p">:</span>
+            <span class="n">md5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">poetry_lock_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">md5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_aladdin_build</span><span class="p">(</span><span class="n">components</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the provided components (or all of them, if none provided here).</span>
+
+<span class="sd">    :param components: The components to build.</span>
+<span class="sd">    :return: The return code of the aladdin build command.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;aladdin&quot;</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">]</span>
+    <span class="n">command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_docker_run</span><span class="p">(</span>
+    <span class="n">component</span><span class="p">,</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+    <span class="n">mount</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/code&quot;</span><span class="p">),</span>
+    <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">workdir</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run a component&#39;s image with the build context mounted as a host volume.</span>
+
+<span class="sd">    :param component: The component whose image to run.</span>
+<span class="sd">    :param tag: The docker :-suffix tag of the image to run, defaults to ``&#39;local&#39;``.</span>
+<span class="sd">    :param mount: The container directory to mount the build context at, defaults to ``&#39;/code&#39;``.</span>
+<span class="sd">    :param command: The command to run in the container.</span>
+<span class="sd">    :param workdir: An alternative directory to start the command in.</span>
+<span class="sd">    :return: The error code of the docker run command. 0 indicates success.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">command</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">normalized_cwd</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;/cygdrive&quot;</span><span class="p">)</span> <span class="p">:]</span> <span class="k">if</span> <span class="n">cwd</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/cygdrive&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">cwd</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;lamp.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">lamp_file</span><span class="p">:</span>
+        <span class="n">lamp_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">lamp_file</span><span class="p">)</span>
+
+    <span class="n">project_name</span> <span class="o">=</span> <span class="n">lamp_data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="n">image_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;docker&quot;</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;--rm&quot;</span><span class="p">,</span> <span class="s2">&quot;-it&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">normalized_cwd</span><span class="si">}</span><span class="s2">/components:</span><span class="si">{</span><span class="n">mount</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">([</span><span class="s2">&quot;-w&quot;</span><span class="p">,</span> <span class="n">workdir</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()]</span> <span class="k">if</span> <span class="n">workdir</span> <span class="k">else</span> <span class="p">[])</span>
+        <span class="o">+</span> <span class="p">[</span><span class="n">image_name</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">command</span>
+    <span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running docker container: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Josh Wilson
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
