@@ -134,7 +134,6 @@ def create(name: pathlib.Path = typer.Argument(None)):
         if not _docker_run(
             component=component,
             tag="local",
-            mount=None,
             command=["poetry", "init"],
             workdir=pathlib.Path("/code") / component,
         ):
