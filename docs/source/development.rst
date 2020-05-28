@@ -5,7 +5,7 @@ Development
 ************
 Using poetry
 ************
-This project uses poetry_ as its package manager and build system. It offers support for deterministic installation of dependencies by utilizing a lock file as well as other useful features to assist application and library development.
+"Componentized" projects use poetry_ as their package manager and build system. poetry_ offers support for deterministic installation of dependencies by utilizing a lock file as well as other useful features to assist application and library development.
 
 While most development operations take place inside of docker containers or in a kubernetes cluster, there are still some things that need to run directly from the development machine. We use `poetry scripts`_ to manage those operations. All of the project-level operations take place in a python virtual environment that poetry automatically creates and maintains for us. See the :ref:`development:Project scripts` section below for more information.
 
@@ -15,10 +15,26 @@ While most development operations take place inside of docker containers or in a
 
 Getting started
 ===============
-The first thing you'll want to do is create a virtual environment and install this project (and implicitly all of its dependencies).
+The first thing you'll want to do is create your project. If the project already exists skip this setup.
+
+.. todo:: Add project hierarchy notes here or refer to aladdin docs
+
+These docs will concern themselves with the poetry setup and the contents and structure of the assumed ``components/`` directory. Create a new project directory (which will also be your git repository).
 
 .. code-block:: shell
 
+    $ poetry new <your project name>
+    $ cd <your project name>
+    $ git init
+
+    # Add this project as a dependency
+    $ poetry add --dev git+https://github.com/jcwilson/aladdin-project-tools.git
+
+Now that you have a project, you'll want to activate a virtual environment and install your project (and implicitly all of its dependencies).
+
+.. code-block:: shell
+
+    # While in your project directory
     $ poetry install
 
 Then activate the virtual environment with
@@ -27,18 +43,12 @@ Then activate the virtual environment with
 
     $ poetry shell
 
-Now you have access to all of the project's dependencies, including dev dependencies, so you can do things like run `pytest` and such without affecting your system's python installation. You will probably want to always be in the poetry shell when working on this project, so be sure to run this command any time you open a new terminal to begin work here.
+Now you have access to all of the project's dependencies, including dev dependencies, so you can do things like run ``pytest`` and such without affecting your system's python installation. You will probably want to always be in the poetry shell when working on your project, so be sure to run this command any time you open a new terminal to begin work there.
 
 
 Project scripts
 ===============
-One poetry feature that we make use of is its ability to create first-order CLI commands from python scripts. When we ran the ``poetry install`` command, it installed a few executables in the virtual environment's ``bin`` directory. You can see their configuration in the ``pyproject.toml`` file:
-
-.. code-block:: toml
-
-    [tool.poetry.scripts]
-    docs = "bin.commands.docs:app"
-    components = "bin.commands.components:app"
+One poetry feature that we make use of is its ability to create first-order CLI commands from python scripts. When we ran the ``poetry install`` command, it installed a few executables an the virtual environment's ``PATH``.
 
 While in the poetry shell, you can run these as CLI commands:
 
@@ -54,12 +64,6 @@ While in the poetry shell, you can run these as CLI commands:
                                       Set the Python logger log level for this
                                       command.
 
-      --install-completion [bash|zsh|fish|powershell|pwsh]
-                                      Install completion for the specified shell.
-      --show-completion [bash|zsh|fish|powershell|pwsh]
-                                      Show completion for the specified shell, to
-                                      copy it or customize the installation.
-
       --help                          Show this message and exit.
 
     Commands:
@@ -69,6 +73,25 @@ While in the poetry shell, you can run these as CLI commands:
       list      List all of the current components.
       run       Run a command in a component's container.
       validate  Validate the components' component.yaml files.
+
+.. code-block::
+
+    $ docs --help
+
+    Usage: docs [OPTIONS] COMMAND [ARGS]...
+
+      Commands for generating the documentation.
+
+    Options:
+      --log-level [NOTSET|SPAM|DEBUG|VERBOSE|INFO|NOTICE|WARN|WARNING|SUCCESS|ERROR|CRITICAL|FATAL]
+                                      Set the Python logger log level for this
+                                      command.
+
+      --help                          Show this message and exit.
+
+    Commands:
+      build  Build the documentation.
+      show   Open the documentation in a browser.
 
 
 *********************
@@ -99,7 +122,6 @@ All components live in the ``components/`` directory. All files are optional. Se
             ...
         components/
             <name of your component>/
-                .dockerignore
                 component.yaml
                 pyproject.toml
                 poetry.lock
@@ -122,22 +144,6 @@ If you provide none of the files listed above, your component image will still b
 - The working directory will be set to ``/code`` and ``/code`` will be added to the ``PYTHONPATH``
 - The ``aladdin-user`` will be created in the ``aladdin-user`` group, along with its home directory
 - The ``poetry`` tool will be installed and available to ``aladdin-user``
-
-
-The ``.dockerignore`` file
---------------------------
-Each component can define its own ``.dockerignore`` file that will be appended to the global ``components/.dockerignore``. Any entries in here should be relative to the component's directory, as the build system will provide the build context-relative prefix automatically.
-
-
-The ``Dockerfile``
-------------------
-You may also provide your own ``Dockerfile``. This will allow you do perform your own specialization not covered by installing python packages through poetry. You can alter the user and their home directory and the build system will detect this and adapt when installing ``poetry`` and python package dependencies.
-
-The docker build context is always the ``components/`` directory. The build system uses dynamic ``.dockerignore`` files to limit the scope of what's available in the build context, though. For instance, performing a ``COPY . .`` command in your component's ``Dockerfile`` will only copy over your component's directory. (This is just an example, as this exact ``COPY`` command is already part of the image building process. In practice, you will rarely need to do your own ``COPY``-ing.)
-
-.. warning::
-    If you set the ``WORKDIR`` in your ``Dockerfile``, all of your component's assets and your component's dependencies' assets will also be placed in the new ``WORKDIR``, too. You probably don't want to set your own ``WORKDER`` unless you have some special use case. It is recommended that you leave it as ``/code``, and if you wish to use a different working directory when running the container, use the ``docker run -w <workdir>`` option or the ``workingDir:`` setting in your helm templates.
-
 
 The ``pyproject.toml`` and ``poetry.lock`` files
 ------------------------------------------------
@@ -169,6 +175,18 @@ If any of these assumptions do not hold true for your component, you will need t
 .. literalinclude:: ../../aladdin_project_tools/etc/sample_component.yaml
   :language: YAML
   :caption: Example ``component.yaml`` file
+
+The ``Dockerfile``
+------------------
+You may also provide your own ``Dockerfile``. This will allow you to perform your own specialization not covered by installing python packages through poetry.
+
+The docker build context is always the ``components/`` directory. This means you'll need to edit the ``.dockerignore`` file in that directory to limit the contents of the docker build context.
+
+.. important::
+    The component image build system actually generates a Dockerfile just prior to the build, it owns the ``FROM`` instruction. If you provide a component Dockerfile do not use the ``FROM`` instruction.
+
+.. warning::
+    If you set the ``WORKDIR`` in your ``Dockerfile``, all of your component's assets and your component's dependencies' assets will also be placed in the new ``WORKDIR``, too. You probably don't want to set your own ``WORKDER`` unless you have some special use case. It is recommended that you leave it as ``/code``, and if you wish to use a different working directory when running the container, use the ``docker run -w <workdir>`` option or the ``workingDir:`` setting in your helm templates.
 
 
 The rest
@@ -215,7 +233,7 @@ For quick tests or debugging, you may be able to run your component with a direc
 
 Edit a component's python dependencies
 ======================================
-Every time a component image is built, an additional "editor" image is built alongside it. This to allow easier editing of poetry-managed python package dependencies. This is very similar to running the component image, except its default ``ENTRYPOINT`` and ``CMD`` values are cleared and you are dropped right into a ``bash`` shell in your component's directory. In situations where you cannot run the container due to a strict ``ENTRYPOINT`` or missing environment variables, using this ``edit`` sub-command is a useful option to inspect your container's contents.
+Every time a component image is built, an additional "editor" image is built alongside it. This to allow easier editing of poetry-managed python package dependencies. This is very similar to running the component image, except its default ``ENTRYPOINT`` and ``CMD`` values are cleared and you are dropped right into a ``bash`` shell in your component's working directory. In situations where you cannot run the container due to a strict ``ENTRYPOINT`` or missing environment variables, using this ``edit`` sub-command is a useful option to inspect your container's contents.
 
 .. code-block:: shell
 
@@ -274,7 +292,7 @@ We use the Sphinx autoapi_ extension to discover and generate documentation from
 
 Project documentation
 ---------------------
-You can find the source files in the ``docs/source`` directory.
+You can find the source files in your project's ``docs/source`` directory.
 
 
 Build the docs

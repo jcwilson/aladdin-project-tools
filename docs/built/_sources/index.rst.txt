@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 
-.. include:: components.rst
+.. include:: development.rst
 
 .. toctree::
    :hidden:

@@ -8,9 +8,6 @@ import typer
 import coloredlogs
 import verboselogs
 import yaml
-from networkx import DiGraph
-from networkx.algorithms.cycles import find_cycle
-from networkx.exception import NetworkXNoCycle
 
 # Discover the logging levels installed by verboselogs
 LogLevel = enum.Enum(

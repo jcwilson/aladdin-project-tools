@@ -17,6 +17,7 @@ Once you ``poetry install`` this project, you can invoke these commands at the c
     $ components --help
 """
 
+import enum
 import hashlib
 import importlib.resources
 import json
@@ -30,7 +31,11 @@ from typing import Iterable, List, Tuple
 import typer
 import jsonschema
 import yaml
+from networkx import DiGraph
 from networkx.algorithms import dag
+from networkx.algorithms.cycles import find_cycle
+from networkx.exception import NetworkXNoCycle
+
 
 from . import LogLevel, install_coloredlogs
 

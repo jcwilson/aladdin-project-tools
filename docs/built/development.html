@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Code" href="code/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="index.html" />
+    <link rel="prev" title="Development" href="index.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -92,10 +92,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#developing-components">Developing components</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#structure-of-a-component">Structure of a component</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#the-dockerignore-file">The <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-dockerfile">The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#the-pyproject-toml-and-poetry-lock-files">The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#the-component-yaml-file">The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-dockerfile">The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#the-rest">The rest</a></li>
 </ul>
 </li>
@@ -182,7 +181,7 @@
         <a href="code/index.html" class="btn btn-neutral float-right" title="Code" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Development" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
   </div>
   
@@ -195,28 +194,38 @@
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="using-poetry">
 <h2>Using poetry<a class="headerlink" href="#using-poetry" title="Permalink to this headline">¶</a></h2>
-<p>This project uses <a class="reference external" href="https://python-poetry.org/">poetry</a> as its package manager and build system. It offers support for deterministic installation of dependencies by utilizing a lock file as well as other useful features to assist application and library development.</p>
+<p>“Componentized” projects use <a class="reference external" href="https://python-poetry.org/">poetry</a> as their package manager and build system. <a class="reference external" href="https://python-poetry.org/">poetry</a> offers support for deterministic installation of dependencies by utilizing a lock file as well as other useful features to assist application and library development.</p>
 <p>While most development operations take place inside of docker containers or in a kubernetes cluster, there are still some things that need to run directly from the development machine. We use <a class="reference external" href="https://python-poetry.org/docs/pyproject/#scripts">poetry scripts</a> to manage those operations. All of the project-level operations take place in a python virtual environment that poetry automatically creates and maintains for us. See the <a class="reference internal" href="#project-scripts"><span class="std std-ref">Project scripts</span></a> section below for more information.</p>
 <div class="section" id="getting-started">
 <h3>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h3>
-<p>The first thing you’ll want to do is create a virtual environment and install this project (and implicitly all of its dependencies).</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ poetry install
+<p>The first thing you’ll want to do is create your project. If the project already exists skip this setup.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Add project hierarchy notes here or refer to aladdin docs</p>
+</div>
+<p>These docs will concern themselves with the poetry setup and the contents and structure of the assumed <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory. Create a new project directory (which will also be your git repository).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ poetry new &lt;your project name&gt;
+$ <span class="nb">cd</span> &lt;your project name&gt;
+$ git init
+
+<span class="c1"># Add this project as a dependency</span>
+$ poetry add --dev git+https://github.com/jcwilson/aladdin-project-tools.git
+</pre></div>
+</div>
+<p>Now that you have a project, you’ll want to activate a virtual environment and install your project (and implicitly all of its dependencies).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># While in your project directory</span>
+$ poetry install
 </pre></div>
 </div>
 <p>Then activate the virtual environment with</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ poetry shell
 </pre></div>
 </div>
-<p>Now you have access to all of the project’s dependencies, including dev dependencies, so you can do things like run <cite>pytest</cite> and such without affecting your system’s python installation. You will probably want to always be in the poetry shell when working on this project, so be sure to run this command any time you open a new terminal to begin work here.</p>
+<p>Now you have access to all of the project’s dependencies, including dev dependencies, so you can do things like run <code class="docutils literal notranslate"><span class="pre">pytest</span></code> and such without affecting your system’s python installation. You will probably want to always be in the poetry shell when working on your project, so be sure to run this command any time you open a new terminal to begin work there.</p>
 </div>
 <div class="section" id="project-scripts">
 <h3>Project scripts<a class="headerlink" href="#project-scripts" title="Permalink to this headline">¶</a></h3>
-<p>One poetry feature that we make use of is its ability to create first-order CLI commands from python scripts. When we ran the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> command, it installed a few executables in the virtual environment’s <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory. You can see their configuration in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.scripts]</span>
-<span class="n">docs</span> <span class="o">=</span> <span class="s">&quot;bin.commands.docs:app&quot;</span>
-<span class="n">components</span> <span class="o">=</span> <span class="s">&quot;bin.commands.components:app&quot;</span>
-</pre></div>
-</div>
+<p>One poetry feature that we make use of is its ability to create first-order CLI commands from python scripts. When we ran the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> command, it installed a few executables an the virtual environment’s <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.</p>
 <p>While in the poetry shell, you can run these as CLI commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ components --help
 Usage: components [OPTIONS] COMMAND [ARGS]...
@@ -228,12 +237,6 @@ Options:
                                   Set the Python logger log level for this
                                   command.
 
-  --install-completion [bash|zsh|fish|powershell|pwsh]
-                                  Install completion for the specified shell.
-  --show-completion [bash|zsh|fish|powershell|pwsh]
-                                  Show completion for the specified shell, to
-                                  copy it or customize the installation.
-
   --help                          Show this message and exit.
 
 Commands:
@@ -243,6 +246,24 @@ Commands:
   list      List all of the current components.
   run       Run a command in a component&#39;s container.
   validate  Validate the components&#39; component.yaml files.
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docs --help
+
+Usage: docs [OPTIONS] COMMAND [ARGS]...
+
+  Commands for generating the documentation.
+
+Options:
+  --log-level [NOTSET|SPAM|DEBUG|VERBOSE|INFO|NOTICE|WARN|WARNING|SUCCESS|ERROR|CRITICAL|FATAL]
+                                  Set the Python logger log level for this
+                                  command.
+
+  --help                          Show this message and exit.
+
+Commands:
+  build  Build the documentation.
+  show   Open the documentation in a browser.
 </pre></div>
 </div>
 </div>
@@ -268,7 +289,6 @@ $ components build --help
         ...
     components/
         &lt;name of your component&gt;/
-            .dockerignore
             component.yaml
             pyproject.toml
             poetry.lock
@@ -293,19 +313,6 @@ $ components build --help
 <li><p>The <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code> will be created in the <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code> group, along with its home directory</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">poetry</span></code> tool will be installed and available to <code class="docutils literal notranslate"><span class="pre">aladdin-user</span></code></p></li>
 </ul>
-<div class="section" id="the-dockerignore-file">
-<h4>The <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file<a class="headerlink" href="#the-dockerignore-file" title="Permalink to this headline">¶</a></h4>
-<p>Each component can define its own <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file that will be appended to the global <code class="docutils literal notranslate"><span class="pre">components/.dockerignore</span></code>. Any entries in here should be relative to the component’s directory, as the build system will provide the build context-relative prefix automatically.</p>
-</div>
-<div class="section" id="the-dockerfile">
-<h4>The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code><a class="headerlink" href="#the-dockerfile" title="Permalink to this headline">¶</a></h4>
-<p>You may also provide your own <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>. This will allow you do perform your own specialization not covered by installing python packages through poetry. You can alter the user and their home directory and the build system will detect this and adapt when installing <code class="docutils literal notranslate"><span class="pre">poetry</span></code> and python package dependencies.</p>
-<p>The docker build context is always the <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory. The build system uses dynamic <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> files to limit the scope of what’s available in the build context, though. For instance, performing a <code class="docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">.</span> <span class="pre">.</span></code> command in your component’s <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> will only copy over your component’s directory. (This is just an example, as this exact <code class="docutils literal notranslate"><span class="pre">COPY</span></code> command is already part of the image building process. In practice, you will rarely need to do your own <code class="docutils literal notranslate"><span class="pre">COPY</span></code>-ing.)</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If you set the <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code> in your <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>, all of your component’s assets and your component’s dependencies’ assets will also be placed in the new <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code>, too. You probably don’t want to set your own <code class="docutils literal notranslate"><span class="pre">WORKDER</span></code> unless you have some special use case. It is recommended that you leave it as <code class="docutils literal notranslate"><span class="pre">/code</span></code>, and if you wish to use a different working directory when running the container, use the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span> <span class="pre">-w</span> <span class="pre">&lt;workdir&gt;</span></code> option or the <code class="docutils literal notranslate"><span class="pre">workingDir:</span></code> setting in your helm templates.</p>
-</div>
-</div>
 <div class="section" id="the-pyproject-toml-and-poetry-lock-files">
 <h4>The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files<a class="headerlink" href="#the-pyproject-toml-and-poetry-lock-files" title="Permalink to this headline">¶</a></h4>
 <p>You will probably provide your own <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> files to specify which python packages your component needs. See the <a class="reference internal" href="#edit-a-component-s-python-dependencies"><span class="std std-ref">Edit a component’s python dependencies</span></a> section below for details about this.</p>
@@ -326,8 +333,8 @@ $ components build --help
 <p class="admonition-title">Important</p>
 <p>If you specify a base image in the <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file, it will not be “aladdinized” or have <code class="docutils literal notranslate"><span class="pre">poetry</span></code> installed by default. It is assumed you are using a different base image for reasons other than building a standard “code” component. You can still instruct the system to apply those changes, but the default behavior is to not apply them when you use a different base image.</p>
 </div>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> schema</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">The <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> schema</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
 <div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;https://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
 
@@ -434,8 +441,8 @@ $ components build --help
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Example <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Example <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
   <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
 
@@ -468,6 +475,19 @@ $ components build --help
 <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">api</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="the-dockerfile">
+<h4>The <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code><a class="headerlink" href="#the-dockerfile" title="Permalink to this headline">¶</a></h4>
+<p>You may also provide your own <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>. This will allow you to perform your own specialization not covered by installing python packages through poetry.</p>
+<p>The docker build context is always the <code class="docutils literal notranslate"><span class="pre">components/</span></code> directory. This means you’ll need to edit the <code class="docutils literal notranslate"><span class="pre">.dockerignore</span></code> file in that directory to limit the contents of the docker build context.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The component image build system actually generates a Dockerfile just prior to the build, it owns the <code class="docutils literal notranslate"><span class="pre">FROM</span></code> instruction. If you provide a component Dockerfile do not use the <code class="docutils literal notranslate"><span class="pre">FROM</span></code> instruction.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you set the <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code> in your <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>, all of your component’s assets and your component’s dependencies’ assets will also be placed in the new <code class="docutils literal notranslate"><span class="pre">WORKDIR</span></code>, too. You probably don’t want to set your own <code class="docutils literal notranslate"><span class="pre">WORKDER</span></code> unless you have some special use case. It is recommended that you leave it as <code class="docutils literal notranslate"><span class="pre">/code</span></code>, and if you wish to use a different working directory when running the container, use the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span> <span class="pre">-w</span> <span class="pre">&lt;workdir&gt;</span></code> option or the <code class="docutils literal notranslate"><span class="pre">workingDir:</span></code> setting in your helm templates.</p>
 </div>
 </div>
 <div class="section" id="the-rest">
@@ -503,7 +523,7 @@ $ components build --help
 </div>
 <div class="section" id="edit-a-component-s-python-dependencies">
 <h3>Edit a component’s python dependencies<a class="headerlink" href="#edit-a-component-s-python-dependencies" title="Permalink to this headline">¶</a></h3>
-<p>Every time a component image is built, an additional “editor” image is built alongside it. This to allow easier editing of poetry-managed python package dependencies. This is very similar to running the component image, except its default <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> and <code class="docutils literal notranslate"><span class="pre">CMD</span></code> values are cleared and you are dropped right into a <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell in your component’s directory. In situations where you cannot run the container due to a strict <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> or missing environment variables, using this <code class="docutils literal notranslate"><span class="pre">edit</span></code> sub-command is a useful option to inspect your container’s contents.</p>
+<p>Every time a component image is built, an additional “editor” image is built alongside it. This to allow easier editing of poetry-managed python package dependencies. This is very similar to running the component image, except its default <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> and <code class="docutils literal notranslate"><span class="pre">CMD</span></code> values are cleared and you are dropped right into a <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell in your component’s working directory. In situations where you cannot run the container due to a strict <code class="docutils literal notranslate"><span class="pre">ENTRYPOINT</span></code> or missing environment variables, using this <code class="docutils literal notranslate"><span class="pre">edit</span></code> sub-command is a useful option to inspect your container’s contents.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ components edit &lt;component&gt;
 </pre></div>
 </div>
@@ -546,7 +566,7 @@ $ docs build --help
 </div>
 <div class="section" id="project-documentation">
 <h4>Project documentation<a class="headerlink" href="#project-documentation" title="Permalink to this headline">¶</a></h4>
-<p>You can find the source files in the <code class="docutils literal notranslate"><span class="pre">docs/source</span></code> directory.</p>
+<p>You can find the source files in your project’s <code class="docutils literal notranslate"><span class="pre">docs/source</span></code> directory.</p>
 </div>
 </div>
 <div class="section" id="build-the-docs">
@@ -575,7 +595,7 @@ $ docs build --help
         <a href="code/index.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Development" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
