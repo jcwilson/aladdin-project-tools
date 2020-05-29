@@ -15,7 +15,6 @@ verboselogs = "^1.7"
 jsonschema = "^3.2.0"
 PyYAML = "^5.3.1"
 isort = "^4.3.21"
-toposort = "^1.5"
 networkx = "^2.4"
 
 [tool.poetry.dev-dependencies]
