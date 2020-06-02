@@ -1,6 +1,109 @@
 {
     "$schema": "https://json-schema.org/draft-07/schema#",
 
+    "definitions": {
+        "packages": {
+            "description": "Additional apt packages to be installed",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "default": []
+        },
+        "standard_image": {
+            "description": "Build an image following the component model.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "packages": {"$ref": "#/definitions/packages"},
+                "user": {
+                    "description": "Define the image user details.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "create": {
+                            "description": "Whether or not to create this user",
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "name": {
+                            "description": "The container user's name. Used for chown purposes.",
+                            "type": "string",
+                            "default": "aladdin-user"
+                        },
+                        "group": {
+                            "description": "The container user's main group. Used for chown purposes.",
+                            "type": "string",
+                            "default": "aladdin-user"
+                        },
+                        "home": {
+                            "description": "The container user's home directory. Will contain the installed python packages.",
+                            "type": "string",
+                            "default": "/home/aladdin-user"
+                        },
+                        "sudo": {
+                            "description": "If creating this user, also add them to the sudoers group. Defaults to True if building in dev mode.",
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                },
+                "workdir": {
+                    "description": "The image's WORKDIR directory",
+                    "type": "string",
+                    "default": "/code"
+                }
+            }
+        },
+        "compatible_image": {
+            "description": "Build an image based on an alternative base image. This will not apply the component model boilerplate, but will allow you to compose other components' code and dependencies into it.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "base": {
+                    "description": "Use this image instead of the language-derived base image.",
+                    "type": "string",
+                    "examples": [
+                        "fivestarsos/commands-base:2.0.0",
+                        "jupyter/minimal-notebook:dc9744740e12"
+                    ]
+                },
+                "packages": {"$ref": "#/definitions/packages"},
+                "user": {
+                    "description": "Define the image user details.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "create": {
+                            "description": "Whether or not to create this user",
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "name": {
+                            "description": "The container user's name. Used for chown purposes.",
+                            "type": "string"
+                        },
+                        "group": {
+                            "description": "The container user's main group. Used for chown purposes.",
+                            "type": "string"
+                        },
+                        "home": {
+                            "description": "The container user's home directory. Will contain the installed python packages.",
+                            "type": "string"
+                        },
+                        "sudo": {
+                            "description": "If creating this user, also add them to the sudoers group. Defaults to True if building in dev mode.",
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    "required": ["name", "group", "home"]
+                }
+            },
+            "required": ["base", "user"]
+        }
+    },
+
     "title": "Component",
     "description": "Configuration for customizing the component image build process.",
     "type": "object",
@@ -16,7 +119,8 @@
                     "minimum": 1,
                     "maximum": 1
                 }
-            }
+            },
+            "required": ["version"]
         },
         "language": {
             "description": "The build system will locate an appropriate base image for the given language information.",
@@ -41,50 +145,10 @@
             }
         },
         "image": {
-            "description": "Customize the image build process with these values.",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "base": {
-                    "description": "Use this image instead of the language-derived base image.",
-                    "type": "string",
-                    "default": "python:3.8-slim",
-                    "examples": [
-                        "fivestarsos/commands-base:2.0.0",
-                        "jupyter/minimal-notebook:dc9744740e12"
-                    ]
-                },
-                "aladdinize": {
-                    "description": "Whether or not to do basic aladdin setup. If the image base value is provided, this will default to false.",
-                    "type": "boolean",
-                    "default": true
-                },
-                "add_poetry": {
-                    "description": "Whether or not to install the poetry package manager on the image. If the image base value is provided, this will default to false.",
-                    "type": "boolean",
-                    "default": true
-                },
-                "user": {
-                    "description": "Read-only details about where to install poetry and python libraries. If not provided, they will be extracted from the base image. Provide these to speed up the build process.",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "name": {
-                            "description": "The container user's name. Used for chown purposes.",
-                            "type": "string"
-                        },
-                        "group": {
-                            "description": "The container user's main group. Used for chown purposes.",
-                            "type": "string"
-                        },
-                        "home": {
-                            "description": "The container user's home directory. Will contain the poetry tool and installed python packages.",
-                            "type": "string"
-                        }
-                    },
-                    "required": ["name"]
-                }
-            }
+            "anyOf": [
+                {"$ref": "#/definitions/standard_image"},
+                {"$ref": "#/definitions/compatible_image"}
+            ]
         },
         "dependencies": {
             "description": "The other components that need to be aggregated into this component.",
@@ -99,5 +163,6 @@
                 ["api", "commands"]
             ]
         }
-    }
+    },
+    "required": ["meta"]
 }
