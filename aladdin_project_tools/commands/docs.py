@@ -123,7 +123,8 @@ def _validate_component_schema():
     try:
         with importlib.resources.path("aladdin_project_tools", "etc") as etc:
             schema_file_path = etc / "component_schema.json"
-            sample_file_path = etc / "sample_component.yaml"
+            sample_standard_file_path = etc / "sample_standard_component.yaml"
+            sample_compatible_file_path = etc / "sample_compatible_component.yaml"
 
         with open(schema_file_path) as schema_file:
             schema = json.load(schema_file)
@@ -137,14 +138,15 @@ def _validate_component_schema():
             logger.error("Invalid etc/component_schema.json\n%s", e)
             raise typer.Abort()
 
-    with open(sample_file_path) as component_file:
-        component_yaml = yaml.safe_load(component_file)
+    for sample_file_path in [sample_standard_file_path, sample_compatible_file_path]:
+        with open(sample_file_path) as component_file:
+            component_yaml = yaml.safe_load(component_file)
 
-    try:
-        jsonschema.validate(instance=component_yaml, schema=schema)
-    except jsonschema.exceptions.ValidationError as e:
-        logger.error("Invalid etc/sample_component.yaml\n%s", e)
-        raise typer.Abort()
+        try:
+            jsonschema.validate(instance=component_yaml, schema=schema)
+        except jsonschema.exceptions.ValidationError as e:
+            logger.error(f"Invalid etc/{sample_file_path.name}\n%s", e)
+            raise typer.Abort()
 
 
 @app.command()

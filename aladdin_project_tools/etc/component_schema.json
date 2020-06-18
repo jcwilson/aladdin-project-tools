@@ -3,7 +3,7 @@
 
     "definitions": {
         "packages": {
-            "description": "Additional apt packages to be installed",
+            "description": "Additional os distribution packages to be installed",
             "type": "array",
             "items": {
                 "type": "string"
@@ -27,31 +27,43 @@
                             "default": true
                         },
                         "name": {
-                            "description": "The container user's name. Used for chown purposes.",
+                            "description": "The container user's name.",
                             "type": "string",
                             "default": "aladdin-user"
                         },
                         "group": {
-                            "description": "The container user's main group. Used for chown purposes.",
+                            "description": "The container user's main group.",
                             "type": "string",
-                            "default": "aladdin-user"
+                            "default": "<user name>"
                         },
                         "home": {
-                            "description": "The container user's home directory. Will contain the installed python packages.",
+                            "description": "The container user's home directory.",
                             "type": "string",
-                            "default": "/home/aladdin-user"
+                            "default": "/home/<user name>"
                         },
                         "sudo": {
-                            "description": "If creating this user, also add them to the sudoers group. Defaults to True if building in dev mode.",
+                            "description": "If creating this user, also add them to the sudoers group.",
                             "type": "boolean",
-                            "default": false
+                            "default": "true if building in dev mode, false otherwise"
                         }
                     }
                 },
                 "workdir": {
-                    "description": "The image's WORKDIR directory",
-                    "type": "string",
-                    "default": "/code"
+                    "description": "The working directory settings for the image",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "create": {
+                            "description": "Whether to set the WORKDIR in the image.",
+                            "type": "boolean",
+                            "default": "true"
+                        },
+                        "path": {
+                            "description": "The WORKDIR directory to use or apply to the image.",
+                            "type": "string",
+                            "default": "/code"
+                        }
+                    }
                 }
             }
         },
@@ -80,27 +92,46 @@
                             "default": false
                         },
                         "name": {
-                            "description": "The container user's name. Used for chown purposes.",
+                            "description": "The container user's name.",
                             "type": "string"
                         },
                         "group": {
-                            "description": "The container user's main group. Used for chown purposes.",
-                            "type": "string"
+                            "description": "The container user's main group.",
+                            "type": "string",
+                            "default": "<user name>"
                         },
                         "home": {
-                            "description": "The container user's home directory. Will contain the installed python packages.",
-                            "type": "string"
+                            "description": "The container user's home directory.",
+                            "type": "string",
+                            "default": "/home/<user name>"
                         },
                         "sudo": {
-                            "description": "If creating this user, also add them to the sudoers group. Defaults to True if building in dev mode.",
+                            "description": "If creating this user, also add them to the sudoers group.",
                             "type": "boolean",
-                            "default": false
+                            "default": "true if building in dev mode, false otherwise"
                         }
                     },
-                    "required": ["name", "group", "home"]
+                    "required": ["name"]
+                },
+                "workdir": {
+                    "description": "The working directory settings for the image",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "create": {
+                            "description": "Whether to set the WORKDIR in the image.",
+                            "type": "boolean",
+                            "default": "false"
+                        },
+                        "path": {
+                            "description": "The WORKDIR directory to use or apply to the image.",
+                            "type": "string"
+                        }
+                    },
+                    "required": ["path"]
                 }
             },
-            "required": ["base", "user"]
+            "required": ["base", "user", "workdir"]
         }
     },
 
@@ -130,8 +161,7 @@
                 "name": {
                     "description": "The component's implementation language.",
                     "type": "string",
-                    "enum": ["python"],
-                    "default": "python"
+                    "enum": ["python"]
                 },
                 "version": {
                     "description": "The language version.",
@@ -141,8 +171,33 @@
                         "3.7",
                         "3.8.2"
                     ]
+                },
+                "spec": {
+                    "description": "Language-specific settings",
+                    "type": "object"
                 }
-            }
+            },
+            "anyOf": [
+                {
+                    "properties": {
+                        "name": {"const": "python"},
+                        "spec": {
+                            "description": "Python-specific settings",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "location": {
+                                    "description": "The location of the Python installation",
+                                    "type": "string",
+                                    "default": "/usr/local",
+                                    "examples": ["/opt/conda"]
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "required": ["name"]
         },
         "image": {
             "anyOf": [
@@ -164,5 +219,5 @@
             ]
         }
     },
-    "required": ["meta"]
+    "required": ["meta", "language"]
 }

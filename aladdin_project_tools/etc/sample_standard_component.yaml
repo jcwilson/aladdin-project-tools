@@ -1,0 +1,19 @@
+meta:
+  version: 1
+
+# Take care to update this as needed if you change the base image.
+language:
+  name: python
+
+image:
+  packages:
+  - curl
+  - netcat
+  - wireshark
+
+# Other components that will be built and composited into this component.
+# In this example, if "api" or "commands" depend on a "shared" component,
+# it will also be composited into the image.
+dependencies:
+- commands
+- api

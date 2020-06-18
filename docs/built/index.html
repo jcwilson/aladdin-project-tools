@@ -305,6 +305,140 @@ $ components build --help
 <div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;https://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
 
+    <span class="nt">&quot;definitions&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Additional os distribution packages to be installed&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;standard_image&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Build an image following the component model.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/packages&quot;</span><span class="p">},</span>
+                <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Define the image user details.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;create&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to create this user&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">true</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s name.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;aladdin-user&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s main group.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;user name&gt;&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;home&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s home directory.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;/home/&lt;user name&gt;&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;sudo&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;If creating this user, also add them to the sudoers group.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;true if building in dev mode, false otherwise&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;workdir&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The workdir settings for the image&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;create&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to set the WORKDIR in the image.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The WORKDIR directory to use or apply to the image.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;/code&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compatible_image&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Build an image based on an alternative base image. This will not apply the component model boilerplate, but will allow you to compose other components&#39; code and dependencies into it.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;base&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Use this image instead of the language-derived base image.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;fivestarsos/commands-base:2.0.0&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;jupyter/minimal-notebook:dc9744740e12&quot;</span>
+                    <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/packages&quot;</span><span class="p">},</span>
+                <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Define the image user details.&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;create&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to create this user&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">false</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s name.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s main group.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;user name&gt;&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;home&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s home directory.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;/home/&lt;user name&gt;&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;sudo&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;If creating this user, also add them to the sudoers group.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;true if building in dev mode, false otherwise&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;workdir&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The workdir settings for the image&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;create&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to set the WORKDIR in the image.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The WORKDIR directory to use or apply to the image.&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;workdir&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
     <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Component&quot;</span><span class="p">,</span>
     <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Configuration for customizing the component image build process.&quot;</span><span class="p">,</span>
     <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
@@ -320,7 +454,8 @@ $ components build --help
                     <span class="nt">&quot;minimum&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
                     <span class="nt">&quot;maximum&quot;</span><span class="p">:</span> <span class="mi">1</span>
                 <span class="p">}</span>
-            <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span>
         <span class="p">},</span>
         <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The build system will locate an appropriate base image for the given language information.&quot;</span><span class="p">,</span>
@@ -330,8 +465,7 @@ $ components build --help
                 <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The component&#39;s implementation language.&quot;</span><span class="p">,</span>
                     <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">],</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span>
+                    <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">]</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The language version.&quot;</span><span class="p">,</span>
@@ -341,54 +475,39 @@ $ components build --help
                         <span class="s2">&quot;3.7&quot;</span><span class="p">,</span>
                         <span class="s2">&quot;3.8.2&quot;</span>
                     <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Language-specific settings&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span>
                 <span class="p">}</span>
-            <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;anyOf&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;const&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span><span class="p">},</span>
+                        <span class="nt">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Python-specific settings&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="nt">&quot;location&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The location of the Python installation&quot;</span><span class="p">,</span>
+                                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/local&quot;</span><span class="p">,</span>
+                                    <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;/opt/conda&quot;</span><span class="p">]</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
         <span class="p">},</span>
         <span class="nt">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Customize the image build process with these values.&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;base&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Use this image instead of the language-derived base image.&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;python:3.8-slim&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;examples&quot;</span><span class="p">:</span> <span class="p">[</span>
-                        <span class="s2">&quot;fivestarsos/commands-base:2.0.0&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;jupyter/minimal-notebook:dc9744740e12&quot;</span>
-                    <span class="p">]</span>
-                <span class="p">},</span>
-                <span class="nt">&quot;aladdinize&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to do basic aladdin setup. If the image base value is provided, this will default to false.&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">true</span>
-                <span class="p">},</span>
-                <span class="nt">&quot;add_poetry&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether or not to install the poetry package manager on the image. If the image base value is provided, this will default to false.&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="kc">true</span>
-                <span class="p">},</span>
-                <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Read-only details about where to install poetry and python libraries. If not provided, they will be extracted from the base image. Provide these to speed up the build process.&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s name. Used for chown purposes.&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                        <span class="p">},</span>
-                        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s main group. Used for chown purposes.&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                        <span class="p">},</span>
-                        <span class="nt">&quot;home&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The container user&#39;s home directory. Will contain the poetry tool and installed python packages.&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                        <span class="p">}</span>
-                    <span class="p">},</span>
-                    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
+            <span class="nt">&quot;anyOf&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/standard_image&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/compatible_image&quot;</span><span class="p">}</span>
+            <span class="p">]</span>
         <span class="p">},</span>
         <span class="nt">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The other components that need to be aggregated into this component.&quot;</span><span class="p">,</span>
@@ -403,38 +522,57 @@ $ components build --help
                 <span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="s2">&quot;commands&quot;</span><span class="p">]</span>
             <span class="p">]</span>
         <span class="p">}</span>
-    <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="s2">&quot;language&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Example <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Example “standard” <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
   <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
 
-<span class="c1"># The language will be discovered from the base image if not provided here.</span>
-<span class="c1"># Provide the value here to speed up the build a little bit.</span>
+<span class="c1"># Take care to update this as needed if you change the base image.</span>
+<span class="nt">language</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+
+<span class="nt">image</span><span class="p">:</span>
+  <span class="nt">packages</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">curl</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">netcat</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">wireshark</span>
+
+<span class="c1"># Other components that will be built and composited into this component.</span>
+<span class="c1"># In this example, if &quot;api&quot; or &quot;commands&quot; depend on a &quot;shared&quot; component,</span>
+<span class="c1"># it will also be composited into the image.</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">commands</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">api</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Example “compatible” <code class="docutils literal notranslate"><span class="pre">component.yaml</span></code> file</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">meta</span><span class="p">:</span>
+  <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+
 <span class="c1"># Take care to update this as needed if you change the base image.</span>
 <span class="nt">language</span><span class="p">:</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
   <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3.7.6</span>
+  <span class="nt">spec</span><span class="p">:</span>
+    <span class="nt">location</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/opt/conda</span>
 
 <span class="nt">image</span><span class="p">:</span>
   <span class="nt">base</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">jupyter/minimal-notebook:dc9744740e12</span>
-  <span class="nt">add_poetry</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-
-  <span class="c1"># If provided, the poetry tool and any python libraries will be installed</span>
-  <span class="c1"># under that user. Providing these can also speed up the build as they</span>
-  <span class="c1"># won&#39;t need to be discovered from the image by a small bit.</span>
-  <span class="c1"># Otherwise, they will be installed under the Dockerfile USER account in</span>
-  <span class="c1"># the image.</span>
   <span class="nt">user</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">jovyan</span>
     <span class="nt">group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">users</span>
-    <span class="nt">home</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/home/jovyan</span>
+  <span class="nt">workdir</span><span class="p">:</span>
+    <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/home/jovyan</span>
 
-<span class="c1"># Other dependencies that will be built and composited into this component.</span>
+<span class="c1"># Other components that will be built and composited into this component.</span>
 <span class="c1"># In this example, if &quot;api&quot; or &quot;commands&quot; depend on a &quot;shared&quot; component,</span>
 <span class="c1"># it will also be composited into the image.</span>
 <span class="nt">dependencies</span><span class="p">:</span>

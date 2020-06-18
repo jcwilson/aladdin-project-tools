@@ -26,6 +26,26 @@
 Module Contents
 ---------------
 
+.. py:class:: ComponentType
+
+   Bases: :class:`str`, :class:`enum.Enum`
+
+   .. attribute:: Standard
+      :annotation: = 1
+
+      
+
+   .. attribute:: Compatible
+      :annotation: = 2
+
+      
+
+   .. attribute:: Traditional
+      :annotation: = 3
+
+      
+
+
 .. function:: main(ctx: typer.Context, log_level: LogLevel = typer.Option(LogLevel.INFO, help='Set the Python logger log level for this command.'))
 
    Commands for working with the project's components.
@@ -43,7 +63,7 @@ Module Contents
    :param components: The components to validate, default is all of them.
 
 
-.. function:: create(name: pathlib.Path = typer.Argument(None))
+.. function:: create(name: pathlib.Path = typer.Argument(None), component_type: ComponentType = typer.Option(ComponentType.Standard, hidden=True, prompt=textwrap.dedent("\n            What kind of component do you wish to create?\n\n            1) Standard - An aladdin component where most of the boilerplate is taken\n                          care of for you already. It will be built from the default\n                          python base image.\n            2) Compatible - Use this if you need to use an alternative base image, but\n                            it's still a python-based image. You will still be able to\n                            compose other components into this component's image.\n            3) Traditional - No special handling will take place and you must provide your\n                             own Dockerfile.\n            "), show_choices=False))
 
    Add a new component to the project.
 
@@ -80,7 +100,7 @@ Module Contents
        $ components build --log-level DEBUG shared api
 
 
-.. function:: run(component: Component, mount: pathlib.Path = typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            ')), command: List[str] = typer.Argument(None))
+.. function:: run(component: Component, command: List[str] = typer.Argument(None))
 
    Run a command in a component's container.
 
@@ -95,8 +115,6 @@ Module Contents
 
 
    :param component: The component container to run.
-   :param mount: The container path at which to mount the ``commponents/`` directory, defaults to
-                 the container's working directory, defaults to ``/code``.
    :param command: Any remaining arguments will be passed to the container as its ``run`` command,
                    defaults to ``/bin/bash``.
 
@@ -121,7 +139,7 @@ Module Contents
        $ components run pipeline -- black --check --diff --target-version py38 .
 
 
-.. function:: edit(component: Component, mount: pathlib.Path = typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            ')))
+.. function:: edit(component: Component)
 
    Run the editor container for the specified component.
 

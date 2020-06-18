@@ -1,0 +1,24 @@
+meta:
+  version: 1
+
+# Take care to update this as needed if you change the base image.
+language:
+  name: python
+  version: 3.7.6
+  spec:
+    location: /opt/conda
+
+image:
+  base: jupyter/minimal-notebook:dc9744740e12
+  user:
+    name: jovyan
+    group: users
+  workdir:
+    path: /home/jovyan
+
+# Other components that will be built and composited into this component.
+# In this example, if "api" or "commands" depend on a "shared" component,
+# it will also be composited into the image.
+dependencies:
+- commands
+- api

@@ -172,9 +172,14 @@ If any of these assumptions do not hold true for your component, you will need t
   :caption: The ``component.yaml`` schema
 
 .. Pull this file in from outside of the docs/ directory
-.. literalinclude:: ../../aladdin_project_tools/etc/sample_component.yaml
+.. literalinclude:: ../../aladdin_project_tools/etc/sample_standard_component.yaml
   :language: YAML
-  :caption: Example ``component.yaml`` file
+  :caption: Example "standard" ``component.yaml`` file
+
+.. Pull this file in from outside of the docs/ directory
+.. literalinclude:: ../../aladdin_project_tools/etc/sample_compatible_component.yaml
+  :language: YAML
+  :caption: Example "compatible" ``component.yaml`` file
 
 The ``Dockerfile``
 ------------------

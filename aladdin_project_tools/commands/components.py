@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import textwrap
@@ -103,7 +104,22 @@ def validate(components: List[Component] = typer.Argument(None)):
 @app.command("list")
 def _list():
     """List all of the current components."""
-    logger.info("Current components: %s", ", ".join(component.value for component in Component))
+    logger.info(
+        "Current components:\n%s",
+        "\n".join(
+            f"    {component.value:16} | {_get_component_type(component):10}"
+            for component in Component
+        ),
+    )
+
+
+def _get_component_type(component: Component) -> str:
+    component_config = _get_component_config(component)
+    if not component_config:
+        return "traditional"
+    elif component_config.get("image", {}).get("base"):
+        return "compatible"
+    return "standard"
 
 
 @app.command()
@@ -165,6 +181,7 @@ def create(
     # Delete the editor image, if it exists
     project_name = lamp["name"]
     editor_image = f"{project_name}-{component}:editor"
+
     subprocess.run(["docker", "rmi", "-f", editor_image], capture_output=True)
 
     if component_type == ComponentType.Standard:
@@ -192,9 +209,16 @@ def _create_standard_component(lamp: dict, component: str) -> None:
     language_name = "python"
     language_version = typer.prompt("Image language version:", default="3.8")
 
+    component_yaml_data = {
+        "meta": {"version": 1},
+        "language": {"name": language_name, "version": language_version},
+    }
+
     available = set(c.name for c in Component if c.name != component)
     dependencies = []
-    if available and typer.confirm("Does this component depend upon any others?", default=True):
+    if available and typer.confirm(
+        "Does this component depend upon any other components?", default=True
+    ):
         try:
             while True:
                 dep = typer.prompt(
@@ -204,31 +228,49 @@ def _create_standard_component(lamp: dict, component: str) -> None:
                     show_choices=True,
                 )
                 available.remove(dep)
-                dependencies.append(dep)
+                component_yaml_data.setdefault("dependencies", []).append(dep)
+        except typer.Abort:
+            print()
+
+    if typer.confirm(
+        "Will this component image depend on any OS distribution packages?", default=False
+    ):
+        try:
+            while True:
+                dep = typer.prompt("Enter a dependency", prompt_suffix="\nCtrl-C to finish: ")
+                component_yaml_data["image"].setdefault("packages", []).append(dep)
         except typer.Abort:
             print()
 
     # Create the initial component.yaml file
     with open(path / "component.yaml", "w") as component_yaml:
         component_yaml.write(
-            yaml.dump(
-                {
-                    "meta": {"version": 1},
-                    "language": {"name": language_name, "version": language_version},
-                    "dependencies": dependencies,
-                }
-            )
+            textwrap.dedent(
+                f"""
+                ################################################################################
+                # This file was originally created with 'components create {component}'.
+                # You may modify it by hand, but take care when doing so.
+                ################################################################################
+
+                # Warning: If you add image.base, you will be transforming this to a "compatible",
+                #          component and the semantics of the values in this file will change.
+                #          If that's your intent, ensure that the other values in this file are
+                #          updated to match the new image as well. See the docs for further details.
+
+                """
+            ).lstrip()
         )
+        component_yaml.write(yaml.dump(component_yaml_data))
 
     logger.notice("Created %s/component.yaml file", path.as_posix())
 
     # Prompt them to potentially create a Dockerfile for their component
-    if typer.confirm("Create a Dockerfile for the new component?", default=False):
+    if typer.confirm("Create a Dockerfile for the new component?", default=True):
         with open(path / "Dockerfile", "w") as dockerfile:
             dockerfile.write(
                 textwrap.dedent(
-                    """
-                    ### BASIC DOCKERFILE ###########################################################
+                    f"""
+                    ### STANDARD DOCKERFILE ########################################################
                     # Edit this file to further specialize your component image
                     ################################################################################
 
@@ -236,13 +278,15 @@ def _create_standard_component(lamp: dict, component: str) -> None:
                     #          file accordingly to ensure that your python packages still work as
                     #          expected.
 
-                    # Warning: Similarly, if you update the base image in the component.yaml file,
-                    #          ensure that the component.yaml python language version is updated to
-                    #          match the base image's python version (if it changed).
-
                     # Note: Do not provide any FROM instructions in this file.
+
+                    # Note: The WORKDIR contains the components/ directory with all of our
+                    #       components in it. Bear this in mind if you need to reference paths
+                    #       and files in this component's directory.
+                    #       For example:
+                    #           ENTRYPOINT "components/{component}/entrypoint.sh"
                     """
-                ).strip()
+                ).lstrip()
             )
 
         logger.notice("Created %s/Dockerfile", path.as_posix())
@@ -292,19 +336,39 @@ def _create_compatible_component(lamp: dict, component: str) -> None:
 
     component_yaml_data = {
         "meta": {"version": 1},
-        "language": {"name": "python"},
-        "image": {"base": None, "user": {"name": None, "group": None, "home": None}},
+        "language": {"name": "python", "spec": {}},
+        "image": {
+            "base": None,
+            "user": {"name": None, "group": None, "home": None},
+            "workdir": {"create": false, "path": None},
+        },
         "dependencies": [],
     }
 
     # component_yaml_data["image"]["base"] = typer.prompt("What base image will you use?")
     component_yaml_data["image"]["base"] = "jupyter/minimal-notebook:latest"
 
-    python_version, user_info = _get_image_info(component_yaml_data["image"]["base"])
+    python_version, python_location, user_info, workdir = _get_image_info(
+        component_yaml_data["image"]["base"]
+    )
 
     component_yaml_data["language"]["version"] = typer.prompt(
         "Image python version:", default=python_version
     )
+    component_yaml_data["language"]["spec"]["location"] = typer.prompt(
+        "Image python installation location:", default=python_location
+    )
+
+    if typer.confirm(
+        "Will this component image depend on any OS distribution packages?", default=False
+    ):
+        try:
+            while True:
+                dep = typer.prompt("Enter a dependency", prompt_suffix="\nCtrl-C to finish: ")
+                component_yaml_data["image"].setdefault("packages", []).append(dep)
+        except typer.Abort:
+            print()
+
     component_yaml_data["image"]["user"]["name"] = typer.prompt(
         "Image user name:", default=user_info["name"]
     )
@@ -315,8 +379,14 @@ def _create_compatible_component(lamp: dict, component: str) -> None:
         "Image user home:", default=user_info["home"]
     )
 
+    component_yaml_data["image"]["workdir"]["path"] = typer.prompt(
+        "Image workdir:", default=workdir
+    )
+
     available = set(c.name for c in Component if c.name != component)
-    if available and typer.confirm("Does this component depend upon any others?", default=True):
+    if available and typer.confirm(
+        "Does this component depend upon any other components?", default=True
+    ):
         try:
             while True:
                 dep = typer.prompt(
@@ -332,23 +402,48 @@ def _create_compatible_component(lamp: dict, component: str) -> None:
 
     # Create the initial component.yaml file
     with open(path / "component.yaml", "w") as component_yaml:
+        component_yaml.write(
+            textwrap.dedent(
+                f"""
+                ################################################################################
+                # This file was originally created with 'components create {component}'.
+                # You may modify it by hand, but take care when doing so.
+                ################################################################################
+
+                # Warning: If you update image.base, ensure that the other values in this file are
+                #          updated to match the new image as well.
+
+                # Note: The WORKDIR contains the components/ directory with all of our components
+                #       in it. Bear this in mind if you need to reference paths and files in this
+                #       component's directory.
+                #       For example:
+                #           ENTRYPOINT "components/{component}/entrypoint.sh"
+                """
+            ).lstrip()
+        )
         component_yaml.write(yaml.dump(component_yaml_data))
 
     logger.notice("Created %s/component.yaml file", path.as_posix())
 
     # Prompt them to potentially create a Dockerfile for their component
-    if typer.confirm("Create a Dockerfile for the new component?", default=False):
+    if typer.confirm("Create a Dockerfile for the new component?", default=True):
         with open(path / "Dockerfile", "w") as dockerfile:
             dockerfile.write(
                 textwrap.dedent(
-                    """
-                    ### BASIC DOCKERFILE ###########################################################
+                    f"""
+                    ### COMPATIBLE DOCKERFILE ######################################################
                     # Edit this file to further specialize your component image
                     ################################################################################
 
                     # Note: Do not provide any FROM instructions in this file.
+
+                    # Note: The WORKDIR contains the components/ directory with all of our
+                    #       components in it. Bear this in mind if you need to reference paths
+                    #       and files in this component's directory.
+                    #       For example:
+                    #           ENTRYPOINT "components/{component}/entrypoint.sh"
                     """
-                ).strip()
+                ).lstrip()
             )
 
         logger.notice("Created %s/Dockerfile", path.as_posix())
@@ -383,12 +478,12 @@ def _create_compatible_component(lamp: dict, component: str) -> None:
     )
 
 
-def _get_image_info(image: str) -> Tuple[str, dict]:
+def _get_image_info(image: str) -> Tuple[str, str, dict, str]:
     """
     Retrieve the python version and user details of the image.
 
     :param image: The image to inspect.
-    :returns: The python version and user details.
+    :returns: The python version, python installation location, user details and workdir.
     """
     try:
         # Perform a "no context" docker build
@@ -404,7 +499,12 @@ def _get_image_info(image: str) -> Tuple[str, dict]:
             ).encode(),
         )
 
-        return (_get_python_version(tag), _get_user_info(tag))
+        return (
+            _get_python_version(tag),
+            _get_python_location(tag),
+            _get_user_info(tag),
+            _get_workdir(tag),
+        )
 
     finally:
         subprocess.run(["docker", "rmi", tag])
@@ -427,6 +527,21 @@ def _get_python_version(image_name) -> str:
             "-c",
             "import platform; print(platform.python_version())",
         ],
+        capture_output=True,
+        check=True,
+    )
+    return ps.stdout.decode().strip()
+
+
+def _get_python_location(image_name) -> str:
+    """
+    Determine the location of the image's python installation.
+
+    :param image_name: The image to inspect.
+    :returns: The installation base directory.
+    """
+    ps = subprocess.run(
+        ["docker", "run", "--rm", image_name, "python", "-c", "import sys; print(sys.exec_prefix)"],
         capture_output=True,
         check=True,
     )
@@ -484,7 +599,7 @@ def _create_traditional_component(lamp: dict, component: str) -> None:
 
                     FROM {base_image}
                     """
-                ).strip()
+                ).lstrip()
             )
 
         logger.notice("Created %s/Dockerfile", path.as_posix())
@@ -530,7 +645,7 @@ def build(components: List[Component] = typer.Argument(None)):
 
 def _validate_components(components: List[Component]):
     """
-    Validate the components' component.yaml files.
+    Validate the components' component.yaml and Dockerfile files.
 
     :param component: The component to validate.
     """
@@ -551,8 +666,16 @@ def _validate_components(components: List[Component]):
 
 
 def _validate_component(component: Component, schema: dict) -> None:
+    """
+    Validate a component's component.yaml and Dockerfile files.
+
+    :param component: The component to validate.
+    :param schema: The component.yaml JSONSchema.
+    """
     component_yaml = _get_component_config(component)
     dockerfile_path = pathlib.Path("components") / component.value / "Dockerfile"
+
+    FROM_PATTERN = re.compile(r"^FROM .+")
 
     if component_yaml:
         try:
@@ -561,10 +684,23 @@ def _validate_component(component: Component, schema: dict) -> None:
             logger.error("Invalid component.yaml for %s component:\n%s", component.value, e)
             raise typer.Abort()
 
-        # TODO: Ensure that there is no FROM instruction in the Dockerfile
+        if dockerfile_path.exists():
+            with open(dockerfile_path) as dockerfile:
+                for line in dockerfile:
+                    if FROM_PATTERN.match(line):
+                        logger.error(f"{dockerfile_path.as_posix()} contains a FROM line")
+                        raise typer.Abort()
+
+        # TODO: Ensure that the image USER info matches what's in component.yaml
 
     elif dockerfile_path.exists():
-        pass
+        with open(dockerfile_path) as dockerfile:
+            for line in dockerfile:
+                if FROM_PATTERN.match(line):
+                    break
+            else:
+                logger.error(f"{dockerfile_path.as_posix()} does not contain a FROM line")
+                raise typer.Abort()
     else:
         logger.error(
             "Component '%s' must provide either component.yaml or Dockerfile", component.value
@@ -790,13 +926,13 @@ def _docker_run(
     image = f"{project_name}-{component}:{tag}"
 
     workdir = pathlib.Path(_get_workdir(image))
-    component_dir = (workdir / component) if in_component_dir else None
+    component_dir = (workdir / "components" / component) if in_component_dir else None
 
     cwd = os.getcwd()
     cwd = cwd[len("/cygdrive") :] if cwd.startswith("/cygdrive") else cwd
 
     command = (
-        ["docker", "run", "--rm", "-it", "-v", f"{cwd}/components:{workdir}"]
+        ["docker", "run", "--rm", "-it", "-v", f"{cwd}/components:{workdir}/components"]
         + (["-w", component_dir.as_posix()] if component_dir else [])
         + [image]
         + command

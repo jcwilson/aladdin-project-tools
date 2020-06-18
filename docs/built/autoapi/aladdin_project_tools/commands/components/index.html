@@ -195,6 +195,27 @@
 </p>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="aladdin_project_tools.commands.components.ComponentType">
+<em class="property">class </em><code class="sig-name descname">ComponentType</code><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#ComponentType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.ComponentType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<dl class="py attribute">
+<dt id="aladdin_project_tools.commands.components.ComponentType.Standard">
+<code class="sig-name descname">Standard</code><em class="property"> = 1</em><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#ComponentType.Standard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.ComponentType.Standard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="aladdin_project_tools.commands.components.ComponentType.Compatible">
+<code class="sig-name descname">Compatible</code><em class="property"> = 2</em><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#ComponentType.Compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.ComponentType.Compatible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="aladdin_project_tools.commands.components.ComponentType.Traditional">
+<code class="sig-name descname">Traditional</code><em class="property"> = 3</em><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#ComponentType.Traditional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.ComponentType.Traditional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="aladdin_project_tools.commands.components.main">
 <code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ctx</span><span class="p">:</span> <span class="n">typer.Context</span></em>, <em class="sig-param"><span class="n">log_level</span><span class="p">:</span> <span class="n">LogLevel</span> <span class="o">=</span> <span class="default_value">typer.Option(LogLevel.INFO, help='Set the Python logger log level for this command.')</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.main" title="Permalink to this definition">¶</a></dt>
@@ -222,7 +243,7 @@
 
 <dl class="py function">
 <dt id="aladdin_project_tools.commands.components.create">
-<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">pathlib.Path</span> <span class="o">=</span> <span class="default_value">typer.Argument(None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">pathlib.Path</span> <span class="o">=</span> <span class="default_value">typer.Argument(None)</span></em>, <em class="sig-param"><span class="n">component_type</span><span class="p">:</span> <span class="n">ComponentType</span> <span class="o">=</span> <span class="default_value">typer.Option(ComponentType.Standard, hidden=True, prompt=textwrap.dedent(&quot;\n            What kind of component do you wish to create?\n\n            1) Standard - An aladdin component where most of the boilerplate is taken\n                          care of for you already. It will be built from the default\n                          python base image.\n            2) Compatible - Use this if you need to use an alternative base image, but\n                            it's still a python-based image. You will still be able to\n                            compose other components into this component's image.\n            3) Traditional - No special handling will take place and you must provide your\n                             own Dockerfile.\n            &quot;), show_choices=False)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new component to the project.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -264,7 +285,7 @@ built.</p>
 
 <dl class="py function">
 <dt id="aladdin_project_tools.commands.components.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">component</span><span class="p">:</span> <span class="n">Component</span></em>, <em class="sig-param"><span class="n">mount</span><span class="p">:</span> <span class="n">pathlib.Path</span> <span class="o">=</span> <span class="default_value">typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            '))</span></em>, <em class="sig-param"><span class="n">command</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">typer.Argument(None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">component</span><span class="p">:</span> <span class="n">Component</span></em>, <em class="sig-param"><span class="n">command</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">typer.Argument(None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a command in a component’s container.</p>
 <p>This will mount the components/ directory in the container.</p>
 <p>This doesn’t precisely run the actual component’s image, as oftentimes one will wish to
@@ -276,8 +297,6 @@ published.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>component</strong> – The component container to run.</p></li>
-<li><p><strong>mount</strong> – The container path at which to mount the <code class="docutils literal notranslate"><span class="pre">commponents/</span></code> directory, defaults to
-the container’s working directory, defaults to <code class="docutils literal notranslate"><span class="pre">/code</span></code>.</p></li>
 <li><p><strong>command</strong> – <p>Any remaining arguments will be passed to the container as its <code class="docutils literal notranslate"><span class="pre">run</span></code> command,
 defaults to <code class="docutils literal notranslate"><span class="pre">/bin/bash</span></code>.</p>
 <div class="admonition important">
@@ -312,7 +331,7 @@ to preface this argument list with <code class="docutils literal notranslate"><s
 
 <dl class="py function">
 <dt id="aladdin_project_tools.commands.components.edit">
-<code class="sig-name descname">edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">component</span><span class="p">:</span> <span class="n">Component</span></em>, <em class="sig-param"><span class="n">mount</span><span class="p">:</span> <span class="n">pathlib.Path</span> <span class="o">=</span> <span class="default_value">typer.Option('/code', help=textwrap.dedent('\n            The container directory at which to mount the components directory.\n\n            Default: /code\n            '))</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.edit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">component</span><span class="p">:</span> <span class="n">Component</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/aladdin_project_tools/commands/components.html#edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aladdin_project_tools.commands.components.edit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the editor container for the specified component.</p>
 <p>This facilitates editing the poetry dependencies in the container that requires them. It assumes
 the image uses poetry to manage its python dependencies.</p>
